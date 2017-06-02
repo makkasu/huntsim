@@ -47,9 +47,8 @@ maxSeeds = 50
 tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
 
 #Lists of objects
-tigerList = pygame.sprite.Group()
-deerList = pygame.sprite.Group()
-spriteList = pygame.sprite.Group() #the sum of the two lists above
+#tigerList = pygame.sprite.Group()
+#deerList = pygame.sprite.Group()
 
 #Energy gained by eating deer or grass
 tigerEatEnergy = 50
@@ -61,7 +60,7 @@ display = pygame.display.set_mode((width * tileSize, height * tileSize))
 pygame.display.set_caption('Hunt Sim')
 
 #Initialise some deer at random locations
-deer, deerSprite = c.spawn_deer(height, width, tileSize)
+c.spawn_creature(height, width, tileSize, "deer")
 
 #Initialise a tiger
 global tiger1
@@ -85,9 +84,9 @@ done = False
 while not done:
     clock.tick(10) # limit fps
 
-    for tiger in tigerList:
+    for tiger in c.tigerList:
         #Detect collisions between each tiger and all the deer on the map. If there is a collision, kill the deer.
-        collision_list = pygame.sprite.spritecollide(tiger, deerList, True)
+        collision_list = pygame.sprite.spritecollide(tiger, c.deerList, True)
 
         for col in collision_list:
             #Give tiger energy
@@ -117,7 +116,9 @@ while not done:
 
     #Update display
     display.blit(bgSurface, tiger1.rect, tiger1.rect)
-    tigersprites.update()
-    tigersprites.draw(display)
+    c.deerList.update()
+    c.tigerList.update()
+    c.deerList.draw(display)
+    c.tigerList.draw(display)
     pygame.display.flip()
     pygame.display.update()

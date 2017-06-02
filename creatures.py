@@ -10,6 +10,10 @@ import pygame
 from pygame.locals import *
 from random import randint
 
+#Lists of objects
+tigerList = pygame.sprite.Group()
+deerList = pygame.sprite.Group()
+
 def load_png(name):
 	image = pygame.image.load(name)
 	if image.get_alpha is None:
@@ -67,7 +71,8 @@ class Tiger(Creature, pygame.sprite.Sprite):
         self.image, self.rect = load_png('tiger.png')
         super(Tiger,self).__init__() # complete the rest of creature initialisation
         self.rect = self.image.get_rect(topleft=(position[0], position[1]))
-        #self.add(tigerList)
+        self.add(tigerList)
+        self.energy = 100
 
 class Deer(Creature, pygame.sprite.Sprite):
     """
@@ -81,10 +86,11 @@ class Deer(Creature, pygame.sprite.Sprite):
         self.image, self.rect = load_png('deer.png')
         super(Deer,self).__init__() # complete the rest of creature initialisation
         self.rect = self.image.get_rect(topleft=(position[0], position[1]))
-        #self.add(deerList)
+        self.add(deerList)
+        self.energy = 100
 
 
-def spawn_deer(height, width, tilesize):
+def spawn_creature(height, width, tilesize, ctype):
     """
     Generates random location and initialises instance of Deer object.
     Returns a deer object & sprite.
@@ -92,7 +98,13 @@ def spawn_deer(height, width, tilesize):
     rangeX = width*tilesize
     rangeY = height*tilesize
     pos = [randint(0,rangeX), randint(0,rangeY)]
-    deer = Deer(pos)
-    deerSprite = pygame.sprite.RenderPlain(deer)
 
-    return deer, deerSprite
+    if ctype == "deer":
+        deer = Deer(pos)
+        deerSprite = pygame.sprite.RenderPlain(deer)
+
+    elif ctype == "tiger":
+        tiger = Tiger(pos)
+        tigerSprite = pygame.sprite.RenderPlain(tiger)
+
+    return
