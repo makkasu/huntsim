@@ -69,7 +69,6 @@ pos = [150,100]
 tiger1 = c.Tiger(pos)
 tigersprites = pygame.sprite.RenderPlain(tiger1)
 
-
 #Draw the map
 bgSurface = pygame.Surface(display.get_size())
 for row in range(height):
