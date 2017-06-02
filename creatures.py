@@ -30,7 +30,8 @@ class Tiger(pygame.sprite.Sprite):
         self.area = screen.get_rect()
         self.speed = 1
         self.state = "stopped"
-        self.target = position
+        self.rect = self.image.get_rect(topleft=(position[0], position[1]))
+        self.target = [0, 0]
 
     def update(self):
         newpos = self.rect.move(self.target)
@@ -53,4 +54,3 @@ class Tiger(pygame.sprite.Sprite):
     def moveright(self):
         self.target[0] = self.target[0] + (self.speed)
         self.state = "right"
-

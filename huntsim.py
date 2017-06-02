@@ -53,7 +53,7 @@ pygame.display.set_caption('Hunt Sim')
 
 #Initialise a tiger
 global tiger1
-pos = [75,50]
+pos = [150,100]
 tiger1 = c.Tiger(pos)
 tigersprites = pygame.sprite.RenderPlain(tiger1)
 
