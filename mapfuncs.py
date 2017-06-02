@@ -1,7 +1,7 @@
 """
 Name: mapfuncs.py 
 Author: Max Potter
-Date: May 2017
+Date: June 2017
 Description:
 	- Contains functions relating to the map
 	- create_map generates a 'Voronoi' map of terrain for use in huntsim.py

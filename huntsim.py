@@ -1,7 +1,7 @@
 """
 Name: mapfuncs.py 
 Authors: Oliver Giles & Max Potter
-Date: May 2017
+Date: June 2017
 Description:
     - Use pygame to create a simplistic model of a tiger hunting deer
     - Randomly generate a tile-based map 
@@ -50,6 +50,9 @@ tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
 pygame.init()
 display = pygame.display.set_mode((width * tileSize, height * tileSize))
 pygame.display.set_caption('Hunt Sim')
+
+#Initialise some deer at random locations
+deer, deerSprite = c.spawn_deer(height, width, tileSize)
 
 #Initialise a tiger
 global tiger1
