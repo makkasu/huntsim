@@ -32,13 +32,14 @@ class Creature():
     def __init__(self):
         screen = pygame.display.get_surface()
         self.area = screen.get_rect()
-        self.speed = 10
+        self.speed = 1
         self.target = [0,0]
 
     def update(self):
         newpos = self.rect.move(self.target)
         if self.area.contains(newpos):
             self.rect = newpos
+        print self.speed #why doesn't it stay at 4?
         pygame.event.pump()
 
     def moveup(self):
@@ -52,6 +53,9 @@ class Creature():
 
     def moveright(self):
         self.target[0] = self.target[0] + (self.speed)
+
+    def change_speed(self, newSpeed):
+        self.speed = newSpeed
 
 
 class Tiger(Creature, pygame.sprite.Sprite):
@@ -70,8 +74,8 @@ class Tiger(Creature, pygame.sprite.Sprite):
         self.energy = 1500
         self.baseSpeed = 2
         self.topSpeed = 4
-        self.speed = self.baseSpeed
         self.drainRate = 1
+        self.change_speed(self.baseSpeed)
 
     def update(self):
         self.energy -= self.drainRate

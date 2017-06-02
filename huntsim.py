@@ -107,12 +107,16 @@ while not done:
                 tiger1.movedown()
             if event.key == K_d:
                 tiger1.moveright()
+            if event.key == K_SPACE:
+                tiger1.change_speed(tiger1.topSpeed)
         elif event.type == KEYUP:
             tempTarget = tiger1.target
             if event.key == K_w or event.key == K_s:
                 tiger1.target[1] = 0
             if event.key == K_a or event.key == K_d:
                 tiger1.target[0] = 0
+            if event.key == K_SPACE:
+                tiger1.change_speed(tiger1.baseSpeed)
 
     #Update display
     # - gather all living sprites into one list and blit them on top of the background
