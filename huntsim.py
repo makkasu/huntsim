@@ -46,6 +46,15 @@ minSeeds = 50
 maxSeeds = 50
 tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
 
+#Lists of objects
+tigerList = pygame.sprite.Group()
+deerList = pygame.sprite.Group()
+spriteList = pygame.sprite.Group() #the sum of the two lists above
+
+#Energy gained by eating deer or grass
+tigerEatEnergy = 50
+deerEatEnergy = 1
+
 #Initiate display
 pygame.init()
 display = pygame.display.set_mode((width * tileSize, height * tileSize))
@@ -59,6 +68,7 @@ global tiger1
 pos = [150,100]
 tiger1 = c.Tiger(pos)
 tigersprites = pygame.sprite.RenderPlain(tiger1)
+
 
 #Draw the map
 bgSurface = pygame.Surface(display.get_size())
@@ -76,11 +86,20 @@ done = False
 while not done:
     clock.tick(10) # limit fps
 
+    for tiger in tigerList:
+        #Detect collisions between each tiger and all the deer on the map. If there is a collision, kill the deer.
+        collision_list = pygame.sprite.spritecollide(tiger, deerList, True)
+
+        for col in collision_list:
+            #Give tiger energy
+            tiger.energy += tigerEatEnergy
+
     #Handle input events
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+
         elif event.type == KEYDOWN:
             if event.key == K_w:
                 tiger1.moveup()
@@ -92,14 +111,10 @@ while not done:
                 tiger1.moveright()
         elif event.type == KEYUP:
             tempTarget = tiger1.target
-            #tiger1.target = [0,0]
-            #tiger1.state = "stopped"
-
             if event.key == K_w or event.key == K_s:
                 tiger1.target[1] = 0
             if event.key == K_a or event.key == K_d:
                 tiger1.target[0] = 0
-
 
     #Update display
     display.blit(bgSurface, tiger1.rect, tiger1.rect)
