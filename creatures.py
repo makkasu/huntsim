@@ -32,7 +32,7 @@ class Creature():
     def __init__(self):
         screen = pygame.display.get_surface()
         self.area = screen.get_rect()
-        self.speed = 1
+        self.speed = 10
         self.state = "stopped"
         self.target = [0,0]
 

@@ -47,8 +47,8 @@ maxSeeds = 50
 tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
 
 #Lists of objects
-#tigerList = pygame.sprite.Group()
-#deerList = pygame.sprite.Group()
+tigerList = pygame.sprite.Group()
+deerList = pygame.sprite.Group()
 
 #Energy gained by eating deer or grass
 tigerEatEnergy = 50
@@ -89,6 +89,8 @@ while not done:
         collision_list = pygame.sprite.spritecollide(tiger, c.deerList, True)
 
         for col in collision_list:
+            #update background to cover up dead (unupdated) sprites
+            display.blit(bgSurface,(0,0))
             #Give tiger energy
             tiger.energy += tigerEatEnergy
 
@@ -115,10 +117,13 @@ while not done:
                 tiger1.target[0] = 0
 
     #Update display
-    display.blit(bgSurface, tiger1.rect, tiger1.rect)
+    # - gather all living sprites into one list and blit them on top of the background
+    cList = c.deerList.sprites() + c.tigerList.sprites()
+    for creature in cList:
+        display.blit(bgSurface, creature.rect, creature.rect)  
     c.deerList.update()
     c.tigerList.update()
+    # - draw all living sprites to the screen
     c.deerList.draw(display)
     c.tigerList.draw(display)
-    pygame.display.flip()
     pygame.display.update()
