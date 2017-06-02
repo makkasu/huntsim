@@ -89,8 +89,6 @@ while not done:
         collision_list = pygame.sprite.spritecollide(tiger, c.deerList, True)
 
         for col in collision_list:
-            #update background to cover up dead (unupdated) sprites
-            display.blit(bgSurface,(0,0))
             #Give tiger energy
             tiger.energy += tigerEatEnergy
 
@@ -119,6 +117,8 @@ while not done:
     #Update display
     # - gather all living sprites into one list and blit them on top of the background
     cList = c.deerList.sprites() + c.tigerList.sprites()
+    #update background to cover up dead (unupdated) sprites
+    display.blit(bgSurface,(0,0))
     for creature in cList:
         display.blit(bgSurface, creature.rect, creature.rect)  
     c.deerList.update()

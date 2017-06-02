@@ -33,7 +33,6 @@ class Creature():
         screen = pygame.display.get_surface()
         self.area = screen.get_rect()
         self.speed = 10
-        self.state = "stopped"
         self.target = [0,0]
 
     def update(self):
@@ -44,19 +43,15 @@ class Creature():
 
     def moveup(self):
         self.target[1] = self.target[1] - (self.speed)
-        self.state = "up"
 
     def movedown(self):
         self.target[1] = self.target[1] + (self.speed)
-        self.state = "down"
 
     def moveleft(self):
         self.target[0] = self.target[0] - (self.speed)
-        self.state = "left"
 
     def moveright(self):
         self.target[0] = self.target[0] + (self.speed)
-        self.state = "right"
 
 
 class Tiger(Creature, pygame.sprite.Sprite):
@@ -72,7 +67,19 @@ class Tiger(Creature, pygame.sprite.Sprite):
         super(Tiger,self).__init__() # complete the rest of creature initialisation
         self.rect = self.image.get_rect(topleft=(position[0], position[1]))
         self.add(tigerList)
-        self.energy = 100
+        self.energy = 1500
+        self.baseSpeed = 2
+        self.topSpeed = 4
+        self.speed = self.baseSpeed
+        self.drainRate = 1
+
+    def update(self):
+        self.energy -= self.drainRate
+
+        if self.energy <= 0:
+            tigerList.remove(self)
+
+        super(Tiger, self).update()
 
 class Deer(Creature, pygame.sprite.Sprite):
     """
@@ -87,8 +94,19 @@ class Deer(Creature, pygame.sprite.Sprite):
         super(Deer,self).__init__() # complete the rest of creature initialisation
         self.rect = self.image.get_rect(topleft=(position[0], position[1]))
         self.add(deerList)
-        self.energy = 100
+        self.energy = 1000
+        self.baseSpeed = 2
+        self.topSpeed = 3
+        self.speed = self.baseSpeed
+        self.drainRate = 2
 
+    def update(self):
+        self.energy -= self.drainRate
+
+        if self.energy <= 0:
+            deerList.remove(self)
+
+        super(Deer, self).update()
 
 def spawn_creature(height, width, tilesize, ctype):
     """
