@@ -18,6 +18,7 @@ def DNA_crossover(f, m):
 			pass
 		else:
 			spliceLocs.append(splice)
+	spliceLocs.sort()
 	readLoc = 0
 	if random.random() >= 0.5:
 		f, m = m, f #50% chance to begin with either male or female splice
