@@ -65,7 +65,7 @@ c.spawn_creature(height, width, tileSize, "deer")
 #Initialise a tiger
 global tiger1
 pos = [150,100]
-tiger1 = c.Tiger(pos)
+tiger1 = c.Creature(pos, 'tiger')
 tigersprites = pygame.sprite.RenderPlain(tiger1)
 
 #Draw the map
@@ -100,15 +100,15 @@ while not done:
 
         elif event.type == KEYDOWN:
             if event.key == K_w:
-                tiger1.moveup()
+                tiger1.moveUp()
             if event.key == K_a:
-                tiger1.moveleft()
+                tiger1.moveLeft()
             if event.key == K_s:
-                tiger1.movedown()
+                tiger1.moveDown()
             if event.key == K_d:
-                tiger1.moveright()
+                tiger1.moveRight()
             if event.key == K_SPACE:
-                tiger1.change_speed(tiger1.topSpeed)
+                tiger1.speedUp()
         elif event.type == KEYUP:
             tempTarget = tiger1.target
             if event.key == K_w or event.key == K_s:
@@ -116,7 +116,7 @@ while not done:
             if event.key == K_a or event.key == K_d:
                 tiger1.target[0] = 0
             if event.key == K_SPACE:
-                tiger1.change_speed(tiger1.baseSpeed)
+                tiger1.speedDown()
 
     #Update display
     # - gather all living sprites into one list and blit them on top of the background
