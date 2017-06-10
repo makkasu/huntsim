@@ -21,24 +21,29 @@ def DNA_crossover(f, m):
 	readLoc = 0
 	if random.random() >= 0.5:
 		f, m = m, f #50% chance to begin with either male or female splice
+	DNA_list = []
 	for idx, i in enumerate(spliceLocs):
-		[(DNA + f[readLoc:i]) if idx % 2 else (DNA + m[readLoc:i])]
+		[DNA_list.append(f[readLoc:i]) if idx % 2 else DNA_list.append(m[readLoc:i])]
 		readLoc = i
 	if len(spliceLocs) % 2:
-		DNA + m[readLoc:]
+		DNA_list.append(m[readLoc:])
+		DNA = ''.join(DNA_list)
 	else:
-		DNA + f[readLoc:]
+		DNA_list.append(f[readLoc:])
+		DNA = ''.join(DNA_list)
 	return DNA
 
-def mutate(DNA): 
+def mutate(DNA):
+	DNA = list(DNA)
 	numMutations = random.randint(1, 5)
-	DNAlength = len(DNA)
 	for i in range(numMutations):
-		mutation = random.randint(1, len(DNA))
-		if mutation == '0':
-			mutation += 1
+		mutation = random.randint(0, (len(DNA) - 1))
+		if DNA[mutation] == '0':
+			DNA[mutation] = '1'
 		else:
-			mutation -= 1
+			DNA[mutation] = '0'
+	DNA = ''.join(DNA)
+	return DNA
 
 def breed(f, m):
 	DNA = DNA_crossover(f, m)
@@ -48,4 +53,6 @@ def breed(f, m):
 f = '1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111'
 m = '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
 
-print breed(f, m)
+dna = breed(f, m)
+print dna
+print len(dna)
