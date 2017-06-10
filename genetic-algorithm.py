@@ -22,17 +22,23 @@ def DNA_crossover(f, m):
 	readLoc = 0
 	if random.random() >= 0.5:
 		f, m = m, f #50% chance to begin with either male or female splice
-	DNA_list = []
+	DNA_c1 = []
+	DNA_c2 = []
 	for idx, i in enumerate(spliceLocs):
-		[DNA_list.append(f[readLoc:i]) if idx % 2 else DNA_list.append(m[readLoc:i])]
+		[DNA_c1.append(f[readLoc:i]) if idx % 2 else DNA_c1.append(m[readLoc:i])]
+		[DNA_c2.append(m[readLoc:i]) if idx % 2 else DNA_c2.append(f[readLoc:i])]
 		readLoc = i
 	if len(spliceLocs) % 2:
-		DNA_list.append(m[readLoc:])
-		DNA = ''.join(DNA_list)
+		DNA_c1.append(m[readLoc:])
+		DNA_c2.append(f[readLoc:])
+		DNA1 = ''.join(DNA_c1)
+		DNA2 = ''.join(DNA_c2)
 	else:
-		DNA_list.append(f[readLoc:])
-		DNA = ''.join(DNA_list)
-	return DNA
+		DNA_c1.append(f[readLoc:])
+		DNA_c2.append(m[readLoc:])
+		DNA1 = ''.join(DNA_c1)
+		DNA2 = ''.join(DNA_c2)
+	return DNA1, DNA2
 
 def mutate(DNA):
 	DNA = list(DNA)
@@ -47,13 +53,20 @@ def mutate(DNA):
 	return DNA
 
 def breed(f, m):
-	DNA = DNA_crossover(f, m)
-	DNA = mutate(DNA)
-	return DNA
+	DNA1, DNA2 = DNA_crossover(f, m)
+	DNA1 = mutate(DNA1)
+	DNA2 = mutate(DNA2)
+	return DNA1, DNA2
 
 f = '1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111'
 m = '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
 
-dna = breed(f, m)
-print dna
-print len(dna)
+dna1, dna2 = breed(f, m)
+print dna1, '\n', dna2
+print len(dna1)
+print dna1.count('1') 
+print dna2.count('1')
+
+#Add parent_select function, and lists for deer/tigers which keep the top 15 or so DNA sequences.
+#parent_select chooses the two strings to mix
+#Each breed should produce 2 children (inverse of each other prior to mutation) so that all DNA is represented. 
