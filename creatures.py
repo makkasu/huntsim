@@ -40,7 +40,7 @@ class Creature():
         if self.area.contains(newpos):
             self.rect = newpos
         print self.speed #why doesn't it stay at 4?
-        pygame.event.pump()
+        #pygame.event.pump()
 
     def moveup(self):
         self.target[1] = self.target[1] - (self.speed)
@@ -85,6 +85,8 @@ class Tiger(Creature, pygame.sprite.Sprite):
 
         super(Tiger, self).update()
 
+        
+
 class Deer(Creature, pygame.sprite.Sprite):
     """
     Deer eat grass
@@ -122,11 +124,11 @@ def spawn_creature(height, width, tilesize, ctype):
     pos = [randint(0,rangeX), randint(0,rangeY)]
 
     if ctype == "deer":
-        deer = Deer(pos)
-        deerSprite = pygame.sprite.RenderPlain(deer)
+        Deer(pos)
+        #deerSprite = pygame.sprite.RenderPlain(deer)
 
     elif ctype == "tiger":
-        tiger = Tiger(pos)
-        tigerSprite = pygame.sprite.RenderPlain(tiger)
+        Tiger(pos)
+        #tigerSprite = pygame.sprite.RenderPlain(tiger)
 
     return
