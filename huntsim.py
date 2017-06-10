@@ -93,30 +93,30 @@ while not done:
             tiger.energy += tigerEatEnergy
 
     #Handle input events
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_SPACE]:
+        tiger1.speed = tiger1.topSpeed
+    else:
+        tiger1.speed = tiger1.baseSpeed
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
 
-        elif event.type == KEYDOWN:
+        if event.type == KEYDOWN:
             if event.key == K_w:
-                tiger1.moveUp()
+                tiger1.dy -= 1
             if event.key == K_a:
-                tiger1.moveLeft()
+                tiger1.dx -= 1
             if event.key == K_s:
-                tiger1.moveDown()
+                tiger1.dy += 1
             if event.key == K_d:
-                tiger1.moveRight()
-            if event.key == K_SPACE:
-                tiger1.speedUp()
+                tiger1.dx += 1
         elif event.type == KEYUP:
-            tempTarget = tiger1.target
             if event.key == K_w or event.key == K_s:
-                tiger1.target[1] = 0
+                tiger1.dy = 0
             if event.key == K_a or event.key == K_d:
-                tiger1.target[0] = 0
-            if event.key == K_SPACE:
-                tiger1.speedDown()
+                tiger1.dx = 0
 
     #Update display
     # - gather all living sprites into one list and blit them on top of the background

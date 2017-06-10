@@ -58,42 +58,21 @@ class Creature(pygame.sprite.Sprite):
         
         #Movement
         self.speed = self.baseSpeed
-        self.target = [0,0]
-
+        self.dx = 0
+        self.dy = 0
 
     def update(self):
         self.energy -= self.drainRate
-
         if self.energy <= 0:
             if self.ctype == 'tiger':
                 tigerList.remove(self)
             if self.ctype == 'deer':
                 deerList.remove(self)
 
-        newpos = self.rect.move(self.target)
-        if self.area.contains(newpos):
-            self.rect = newpos
-        print self.speed, self.target #why doesn't it stay at 4?
+        self.rect.x += self.dx * self.speed
+        self.rect.y += self.dy * self.speed
+        
         pygame.event.pump()
-
-    #Controls
-    def moveUp(self):
-        self.target[1] = self.target[1] - (self.speed)
-
-    def moveDown(self):
-        self.target[1] = self.target[1] + (self.speed)
-
-    def moveLeft(self):
-        self.target[0] = self.target[0] - (self.speed)
-
-    def moveRight(self):
-        self.target[0] = self.target[0] + (self.speed)
-
-    def speedUp(self):
-        self.speed = self.topSpeed
-
-    def speedDown(self):
-        self.speed = self.baseSpeed
 
 
 def spawn_creature(height, width, tilesize, ctype):
