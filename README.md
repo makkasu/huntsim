@@ -10,10 +10,11 @@ AI is implemented as a static Tensorflow neural network.
 Let's see what happens!
 
 Implemented:
-- Simple game loop with a controlable tiger.
+- Map generator
+- Simple game loop with a controlable tiger
+- Added killable deer
 
 To-do:
-- Add deer
 - Add vision system
 - Add health/energy system
 - Implement AI
