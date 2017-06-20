@@ -74,21 +74,23 @@ class Creature(pygame.sprite.Sprite):
         pygame.event.pump()
 
 
-def spawn_creature(height, width, tilesize, ctype):
+def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1]):
     """
-    Generates random location and initialises instance of Deer object.
-    Returns a deer object & sprite.
+    Initialises instance of a creature of type ctype.
+    In absence of pos argument, spawn location is randomly generated based on height & width.
+    Returns an object and a sprite.
     """
-    rangeX = width*tilesize
-    rangeY = height*tilesize
-    pos = [randint(0,rangeX), randint(0,rangeY)]
+    #if pos is unchanged by user then randomly generate a position
+    if pos == [-1,-1]: 
+        rangeX = mapWidth*tileSize
+        rangeY = mapHeight*tileSize
+        pos = [randint(0,rangeX), randint(0,rangeY)]
+    
+    #if pos argument is passed but invalid, make it [0,0]
+    if pos[0] < 0 and pos[1] < 0: 
+        pos = [0,0]
 
-    if ctype == "deer":
-        deer = Creature(pos, 'deer')
-        deerSprite = pygame.sprite.RenderPlain(deer)
+    newCreature = Creature(pos, ctype)
+    newSprite = pygame.sprite.RenderPlain(newCreature)
 
-    elif ctype == "tiger":
-        tiger = Creature(pos, 'tiger')
-        tigerSprite = pygame.sprite.RenderPlain(tiger)
-
-    return
+    return newCreature, newSprite

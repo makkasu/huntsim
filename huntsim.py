@@ -60,13 +60,11 @@ display = pygame.display.set_mode((width * tileSize, height * tileSize))
 pygame.display.set_caption('Hunt Sim')
 
 #Initialise some deer at random locations
-c.spawn_creature(height, width, tileSize, "deer")
+for i in range(10):
+    c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
 
 #Initialise a tiger
-global tiger1
-pos = [150,100]
-tiger1 = c.Creature(pos, 'tiger')
-tigersprites = pygame.sprite.RenderPlain(tiger1)
+tiger1, tigersprites = c.spawn_creature("tiger", pos=[150,100])
 
 #Draw the map
 bgSurface = pygame.Surface(display.get_size())
