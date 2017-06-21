@@ -12,6 +12,7 @@ import sys
 from pygame.locals import *
 import mapfuncs as mf
 import creatures as c
+from copy import deepcopy
 
 #Constants for colours
 orange = (242, 68, 56)
@@ -45,6 +46,7 @@ width = 150
 minSeeds = 50
 maxSeeds = 50
 tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
+tilemapMaster = deepcopy(tilemap) #edits to sub arrays in tilemap won't edit tilemapMaster
 
 #Lists of objects
 tigerList = pygame.sprite.Group()
@@ -52,19 +54,12 @@ deerList = pygame.sprite.Group()
 
 #Energy gained by eating deer or grass
 tigerEatEnergy = 50
-deerEatEnergy = 1
+deerEatEnergy = 3
 
 #Initiate display
 pygame.init()
 display = pygame.display.set_mode((width * tileSize, height * tileSize))
 pygame.display.set_caption('Hunt Sim')
-
-#Initialise some deer at random locations
-for i in range(10):
-    c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
-
-#Initialise a tiger
-tiger1, tigersprites = c.spawn_creature("tiger", pos=[150,100])
 
 #Draw the map
 bgSurface = pygame.Surface(display.get_size())
@@ -73,6 +68,13 @@ for row in range(height):
         bgRect = pygame.draw.rect(bgSurface, colours[tilemap[row][column]], (column*tileSize, row*tileSize, tileSize, tileSize))
 bgSurface = bgSurface.convert()
 display.blit(bgSurface,(0,0)) # blit the map to the screen
+
+#Initialise some deer at random locations
+for i in range(10):
+    c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
+
+#Initialise a tiger
+tiger1, tigersprites = c.spawn_creature("tiger", pos=[150,100])
 
 #Initialise blank lists for previous tiger and deer positions on the map
 oldDeerPoints = []
@@ -122,7 +124,7 @@ while not done:
 
     #Update display
     # - gather all living sprites into one list and blit them on top of the background
-    cList = c.deerList.sprites() + c.tigerList.sprites()
+    cList = c.tigerList.sprites() + c.deerList.sprites()
     #update background to cover up dead (unupdated) sprites
     display.blit(bgSurface,(0,0))
     for creature in cList:
@@ -142,33 +144,21 @@ while not done:
         j = int(creature.rect.centerx/tileSize)
         i = int(creature.rect.centery/tileSize)
 
-        #BUG CATCHING - sometimes deer are generated "off" the map, so I've put this here but should be fixed in deer spawn.
-        if i >= height:
-            i = height-1
-        if j >= width:
-            j = width-1
-        if i < 0:
-            i = 0
-        if j < 0:
-            j = 0
-
-        if creature.ctype == "tiger":
-            tigerPoints.append([i,j,tilemap[i][j]])
+        #Update tilemap to reflect what creatures are on each tiles - tigers trump deer
+        if creature.ctype == "tiger" and tilemapMaster != wood: #tigers are invisible in the forest
+            tigerPoints.append([i,j])
             tilemap[i][j] = 4
-        elif creature.ctype == "deer":
+        elif creature.ctype == "deer" and tilemap[i][j] != tiger: 
             tilemap[i][j] = 3
-            deerPoints.append([i,j,tilemap[i][j]])
-    tempOTPL = []
-    tempTPL = []
-    for otp in oldTigerPoints:
-        tempOTPL.append([otp[0],otp[1]])
-    for tp in tigerPoints:
-        tempTPL.append([tp[0],tp[1]])
-    emptyTiles = [x for x in tempOTPL if x not in tempTPL]
-    print emptyTiles, tempOTPL, tempTPL
-    for idx, tile in enumerate(emptyTiles):
-        print tilemap[tile[0]][tile[1]] 
-        tilemap[tile[0]][tile[1]] = oldTigerPoints[idx][2]
-        print tilemap[tile[0]][tile[1]] 
+            deerPoints.append([i,j])
+            if tilemapMaster[i][j] == grass: #don't forget to feed the deer!
+                creature.eat(deerEatEnergy)
+
+    #Gather list of empty tiles by comparing old and new lists, then replace the tiles with their original types.
+    emptyTiles = [point for point in oldTigerPoints if point not in tigerPoints]
+    emptyTiles.extend([point for point in oldDeerPoints if point not in deerPoints])
+    for tile in emptyTiles:
+        tilemap[tile[0]][tile[1]] = tilemapMaster[tile[0]][tile[1]]
+
     oldDeerPoints = deerPoints
     oldTigerPoints = tigerPoints

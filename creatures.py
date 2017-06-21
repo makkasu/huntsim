@@ -73,6 +73,9 @@ class Creature(pygame.sprite.Sprite):
         
         pygame.event.pump()
 
+    def eat(self, eatEnergy):
+        self.energy += eatEnergy
+
 
 def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1]):
     """
@@ -82,8 +85,8 @@ def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1
     """
     #if pos is unchanged by user then randomly generate a position
     if pos == [-1,-1]: 
-        rangeX = mapWidth*tileSize
-        rangeY = mapHeight*tileSize
+        rangeX = (mapWidth-1)*tileSize
+        rangeY = (mapHeight-1)*tileSize
         pos = [randint(0,rangeX), randint(0,rangeY)]
     
     #if pos argument is passed but invalid, make it [0,0]
