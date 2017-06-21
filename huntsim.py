@@ -94,7 +94,7 @@ while not done:
 
         for col in collision_list:
             #Give tiger energy
-            tiger.energy += tigerEatEnergy
+            tiger.eat(tigerEatEnergy)
 
     #Handle input events
     keys = pygame.key.get_pressed()
