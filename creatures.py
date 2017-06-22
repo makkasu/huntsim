@@ -60,6 +60,9 @@ class Creature(pygame.sprite.Sprite):
         self.dx = 0
         self.dy = 0
 
+        #Vision
+        self.vision = [[-1 for column in range(5)] for row in range(5)]
+
     def update(self):
         self.energy -= self.drainRate
         if self.energy <= 0:

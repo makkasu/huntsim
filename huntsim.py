@@ -97,6 +97,17 @@ while not done:
             #Give tiger energy
             tiger.eat(tigerEatEnergy)
 
+    #Gather all living sprites into one list
+    cList = c.tigerList.sprites() + c.deerList.sprites()
+    #Update creature vision
+    for creature in cList:
+        i, j = mf.find_tile(creature, tileSize, height, width)
+        creature.vision = mf.get_vision(i, j, tilemap, height, width)
+        if creature.ctype == "tiger":
+            print '\n'
+            print('\n'.join([''.join(['{:4}'.format(item) for item in row]) for row in creature.vision]))
+     
+
     #Handle input events
     keys = pygame.key.get_pressed()
     if keys[pygame.K_SPACE]:
@@ -124,8 +135,7 @@ while not done:
                 tiger1.dx = 0
 
     #Update display
-    # - gather all living sprites into one list and blit them on top of the background
-    cList = c.tigerList.sprites() + c.deerList.sprites()
+    #Blit all living sprites on top of the background
     for creature in cList:
         creature.rect.clamp_ip(displayRect)
     #update background to cover up dead (unupdated) sprites

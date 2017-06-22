@@ -59,3 +59,24 @@ def find_tile(creature, tileSize, height, width):
 		j = width - 1
 		
 	return i, j
+
+def get_vision(i, j, tilemap, height, width):
+	"""
+	Takes tilemap and indicies, returns 5x5 section of tilemap centred on (i,j).
+	"""
+	#Set up 5x5 array, every element is -1 (which will indicate 'seeing off map')
+	vision = [[-1 for column in range(5)] for row in range(5)]
+
+	for idx in range(5):
+		for jdx in range(5):
+			#Find tilemap index we want to look at
+			tmidx = i - 2 + idx
+			tmjdx = j - 2 + jdx
+
+			#Skip changing vision list if index is out of tilemap bounds
+			if tmidx < 0 or tmjdx < 0 or tmidx > height - 1 or tmjdx < 0 or tmjdx > width - 1:
+				continue
+
+			vision[idx][jdx] = tilemap[i - 2 + idx][j - 2 + jdx]
+
+	return vision
