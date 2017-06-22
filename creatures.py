@@ -8,7 +8,7 @@ Description:
 
 import pygame
 from pygame.locals import *
-from random import randint
+from random import randint, choice
 
 #Lists of objects
 tigerList = pygame.sprite.Group()
@@ -33,6 +33,7 @@ class Creature(pygame.sprite.Sprite):
     def __init__(self, position, ctype):
         pygame.sprite.Sprite.__init__(self)
         self.ctype = ctype
+        self.name = self.get_name()
 
         #Handle creature type senstive parameters
         if ctype == 'tiger':
@@ -75,6 +76,9 @@ class Creature(pygame.sprite.Sprite):
         self.rect.y += self.dy * self.speed
         
         pygame.event.pump()
+
+    def get_name(self):
+        return choice(list(open('names.txt')))
 
     def eat(self, eatEnergy):
         self.energy += eatEnergy

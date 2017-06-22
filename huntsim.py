@@ -71,11 +71,19 @@ bgSurface = bgSurface.convert()
 display.blit(bgSurface,(0,0)) # blit the map to the screen
 
 #Initialise some deer at random locations
+print "Meet the deer!"
 for i in range(10):
-    c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
+    tempCreature = c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
+    print tempCreature[0].name
+
+print "\n"
 
 #Initialise a tiger
 tiger1, tigersprites = c.spawn_creature("tiger", pos=[150,100])
+print "And here come the tigers!"
+for i in range(5):
+    tempCreature = c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize)
+    print tempCreature[0].name
 
 #Initialise blank lists for previous tiger and deer positions on the map
 oldDeerPoints = []
@@ -89,25 +97,24 @@ done = False
 while not done:
     clock.tick(10) # limit fps
 
+    #Detect collisions between each tiger and all the deer on the map. If there is a collision, kill the deer.
     for tiger in c.tigerList:
-        #Detect collisions between each tiger and all the deer on the map. If there is a collision, kill the deer.
         collision_list = pygame.sprite.spritecollide(tiger, c.deerList, True)
-
         for col in collision_list:
-            #Give tiger energy
             tiger.eat(tigerEatEnergy)
 
     #Gather all living sprites into one list
     cList = c.tigerList.sprites() + c.deerList.sprites()
+
     #Update creature vision
     for creature in cList:
         i, j = mf.find_tile(creature, tileSize, height, width)
         creature.vision = mf.get_vision(i, j, tilemap, height, width)
-        if creature.ctype == "tiger":
-            print '\n'
-            print('\n'.join([''.join(['{:4}'.format(item) for item in row]) for row in creature.vision]))
+        creature.vision[2][2] = tilemapMaster[i][j] #stop the tiger seeing itself in the centre square
+        # if creature.ctype == "tiger":
+        #     print '\n'
+        #     print('\n'.join([''.join(['{:4}'.format(item) for item in row]) for row in creature.vision]))
      
-
     #Handle input events
     keys = pygame.key.get_pressed()
     if keys[pygame.K_SPACE]:
