@@ -31,13 +31,10 @@ class Mind():
 		#Define Keras model of the brain, using sequential layers of activation neurons
 		#Set weights using DNA : https://keras.io/models/about-keras-models/
 		model = Sequential()
-		model.add(Dense(neuronsPerLayer, input_shape = (inputCount,)))
-		model.add(Activation('relu'))
+		model.add(Dense(neuronsPerLayer, input_shape = (inputCount,), activation='relu'))
 		for i in range(numLayers - 1):
-			model.add(Dense(neuronsPerLayer))
 			model.add(Activation('relu'))
-		model.add(Dense(outputNeurons))
-		model.add(Activation('relu'))
+		model.add(Dense(outputNeurons, activation='relu'))
 
 def think(mind, vision):
 	#Use the creatures Keras model and vision to determine direction/speed
