@@ -1,5 +1,5 @@
 """
-Name: genetic-algorithm.py 
+Name: genetic-algorithm.py
 Author: Oliver Giles & Max Potter
 Date: June 2017
 Description:
