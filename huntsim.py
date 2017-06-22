@@ -38,9 +38,9 @@ colours = {
           }
           
 #Game dimensions
-tileSize = 6 
-height = 100
-width = 150
+tileSize = 30 
+height = 20
+width = 30
 
 #Create tilemap list
 minSeeds = 50

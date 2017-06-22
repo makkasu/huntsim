@@ -20,7 +20,7 @@ def create_map(width, height, minSeeds, maxSeeds):
 	seedList = []
 	for i in range(seedNumber):
 	    point = (randint(0,height),randint(0,width))
-	    typeList = [0] * 6 + [1] * 2 + [2] * 1 # weighted list of types
+	    typeList = [0] * 4 + [1] * 2 + [2] * 1 # weighted list of types
 	    seedType = choice(typeList)
 	    seedList.append((point,seedType)) # add a seed at a random point with a random type to the list
 	#For all tiles, which seed type is closest? Adopt that type.
