@@ -59,6 +59,7 @@ deerEatEnergy = 3
 #Initiate display
 pygame.init()
 display = pygame.display.set_mode((width * tileSize, height * tileSize))
+displayRect = display.get_rect()
 pygame.display.set_caption('Hunt Sim')
 
 #Draw the map
@@ -125,6 +126,8 @@ while not done:
     #Update display
     # - gather all living sprites into one list and blit them on top of the background
     cList = c.tigerList.sprites() + c.deerList.sprites()
+    for creature in cList:
+        creature.rect.clamp_ip(displayRect)
     #update background to cover up dead (unupdated) sprites
     display.blit(bgSurface,(0,0))
     for creature in cList:
@@ -140,9 +143,8 @@ while not done:
     tigerPoints = []
     deerPoints = []
     for creature in cList:
-        #what tile is the tiger on?
-        j = int(creature.rect.centerx/tileSize)
-        i = int(creature.rect.centery/tileSize)
+        #what tile is the creature on?
+        i, j = mf.find_tile(creature, tileSize, height, width)
 
         #Update tilemap to reflect what creatures are on each tiles - tigers trump deer
         if creature.ctype == "tiger" and tilemapMaster != wood: #tigers are invisible in the forest

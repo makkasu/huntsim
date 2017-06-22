@@ -40,3 +40,22 @@ def create_map(width, height, minSeeds, maxSeeds):
 	        tilemap[row][column] = closestSeed[1]
 
 	return tilemap
+
+def find_tile(creature, tileSize, height, width):
+	"""
+	Takes a creature and finds the tilemap indicies of the tile it is standing on.
+	Forces indicies to be within the bounds of tilemap.
+	"""
+	j = int(creature.rect.centerx/tileSize)
+	i = int(creature.rect.centery/tileSize)
+
+	if i < 0:
+		i = 0
+	if i >= height:
+		i = height - 1
+	if j < 0:
+		j = 0
+	if j >= width:
+		j = width - 1
+		
+	return i, j
