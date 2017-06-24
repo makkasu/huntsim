@@ -28,15 +28,16 @@ class Mind():
 				((self.neuronsPerLayer * self.neuronsPerLayer) * self.numLayers) + self.neuronsPerLayer * 
 				self.outputNeurons + self.neuronsPerLayer * self.numLayers + self.outputNeurons)
 			self.DNAbin = []
-			for i in range(0, self.DNAlength * 32):
+			for i in range(0, self.DNAlength * 12):
 				self.DNAbin.append(str(random.randint(0,1)))
-			self.b = BitArray(float=0.00, length=32)
+			self.b = BitArray(int=0, length=12)
 			self.DNAbin = ''.join(self.DNAbin)
 
 			self.DNA = []
-			for i in range(0, len(self.DNAbin), 32):
-				self.b.bin = self.DNAbin[i:i+32]
-				self.DNA.append([0.000001 if math.isnan(self.b.float) else self.b.float])
+			for i in range(0, len(self.DNAbin), 12):
+				self.b.bin = self.DNAbin[i:i+12]
+				self.DNA.append([float(self.b.int) if math.isnan(self.b.int) else float(self.b.int)]) 
+				#Currently does nothing - replace first word with 1
 
 		#Convert DNA to weights
 		self.weights = []
