@@ -13,14 +13,15 @@ import numpy as np
 from bitstring import BitArray
 
 class Mind():
-	def __init__(self, numTiles=25, neuronsPerLayer=50, numLayers=2, firstGeneration, DNA):
+	def __init__(self, numTiles=25, neuronsPerLayer=50, numLayers=2, firstGeneration=False, DNA=''):
 		self.inputCount = numTiles
 		self.outputNeurons = 5 #up, down, left, right, speed
 
-		if firstGeneration:
+		if self.firstGeneration:
 			#Generate random DNA for the first generation
-			self.DNAlength = (inputCount * neuronsPerLayer + neuronsPerLayer * (numLayers - 1) + 
-				neuronsPerLayer * outputNeurons + outputNeurons)
+			self.DNAlength = (self.inputCount * self.neuronsPerLayer + self.neuronsPerLayer * 
+				(self.numLayers - 1) + self.neuronsPerLayer * self.outputNeurons + 
+				self.outputNeurons)
 			self.DNAbin = []
 			for i in range(0, self.DNAlength * 32):
 				self.DNAbin.append(random.randint(0,1))
@@ -33,32 +34,33 @@ class Mind():
 				self.DNA.append(b.float)
 
 		#Convert DNA to weights/biases
-		weights = []
-		count = 0
-		l = np.array(self.DNA[count:count + numTiles*neuronsPerLayer])
-		count += numTiles*neuronsPerLayer
-		l = l.reshape(inputCount, neuronsPerLayer)
-		weights.append(l)
-		for i in range(numLayers - 1):
-			l = np.array(self.DNA[count:count + neuronsPerLayer])
-			count += neuronsPerLayer
-			weights.append(l)
-		l = np.array(self.DNA[count:count + outputNeurons*neuronsPerLayer])
-		l = l.reshape(neuronsPerLayer, outputNeurons)
-		weights.append(l)
-		count += neuronsPerLayer * outputNeurons
-		l = np.array(self.DNA[count:count + outputNeurons])
-		weights.append(l)
+		self.weights = []
+		self.count = 0
+		self.l = np.array(self.DNA[self.count:self.count + self.numTiles*self.neuronsPerLayer])
+		self.count += self.numTiles*self.neuronsPerLayer
+		self.l = self.l.reshape(self.inputCount, self.neuronsPerLayer)
+		self.weights.append(self.l)
+		for i in range(self.numLayers - 1):
+			self.l = np.array(self.DNA[self.count:self.count + self.neuronsPerLayer])
+			self.count += self.neuronsPerLayer
+			self.weights.append(l)
+		self.l = np.array(self.DNA[self.count:self.count + self.outputNeurons*self.neuronsPerLayer])
+		self.l = self.l.reshape(self.neuronsPerLayer, self.outputNeurons)
+		self.weights.append(self.l)
+		self.count += self.neuronsPerLayer * self.outputNeurons
+		self.l = np.array(self.DNA[self.count:self.count + self.outputNeurons])
+		self.weights.append(l)
 
 		#Define Keras model of the brain, using sequential layers of activation neurons
-		model = Sequential()
-		model.add(Dense(neuronsPerLayer, input_shape = (inputCount,), activation='relu'))
-		for i in range(numLayers - 1):
-			model.add(Activation('relu'))
-		model.add(Dense(outputNeurons, activation='relu'))
-		model.set_weights(weights)
+		self.model = Sequential()
+		self.model.add(Dense(self.neuronsPerLayer, input_shape = (self.inputCount,), activation='relu'))
+		for i in range(self.numLayers - 1):
+			self.model.add(Activation('relu'))
+		self.model.add(Dense(self.outputNeurons, activation='relu'))
+		self.model.set_weights(self.weights)
+		self.model.add(Activation('relu'))
 
-def think(mind, vision):
-	#Use the creatures Keras model and vision to determine direction/speed
-	actions = mind.predict(vision)
-	return actions
+	def think(vision):
+		#Use the creatures Keras model and vision to determine direction/speed
+		self.actions = self.model.predict(vision)
+		return self.actions
