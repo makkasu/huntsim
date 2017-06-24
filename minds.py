@@ -43,6 +43,8 @@ class Mind():
 		self.count = 0
 		#Normalise our converted DNA to floats between -0.5 and 0.5
 		self.DNA = (self.DNA-np.amin(self.DNA))/(np.amax(self.DNA)-np.amin(self.DNA)) - 0.5
+		#IMPORTANT QUESTION - SHOULDN'T IT BE NORMALISED BETWEEN MAX POSSIBLE VALUES, RATHER THAN MAX
+		#VALUES PRESENT? I THINK SO. -2048, 2047
 
 		#Convert list of weights into shaped arrays for each layer
 		#Input weights: inputCount x neuronsPerLayer matrix
@@ -90,6 +92,6 @@ class Mind():
 
 	def think(self, vision):
 		#Use the creatures Keras model and vision to determine direction/speed
-		vision = np.array([[element for sublist in vision for element in sublist]])
+		vision = np.array([[element for sublist in vision for element in sublist]]) #Flatten array
 		self.actions = self.model.predict(vision)
 		return self.actions

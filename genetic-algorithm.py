@@ -58,6 +58,10 @@ def breed(f, m):
 	DNA2 = mutate(DNA2)
 	return DNA1, DNA2
 
+#Add genepools for deer and tiger. 
+#Add a pool function which is called from huntim->creature and passes DNA, fitness and ctype
+#Add a select function which chooses two parents from genepool, weighted to select the top ones
+
 f = '1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111'
 m = '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
 
