@@ -105,9 +105,9 @@ class Creature(pygame.sprite.Sprite):
                 right = True
 
             if up and not down:
-                self.dy = -1
-            if down and not up:
                 self.dy = 1
+            if down and not up:
+                self.dy = -1
             if left and not right:
                 self.dx = -1
             if right and not left:
