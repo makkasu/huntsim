@@ -7,7 +7,7 @@ Description:
 """
 
 from keras.models import Sequential
-from keras.layers import Activation, Dense
+from keras.layers import Dense
 import random
 import numpy as np
 import math
@@ -24,54 +24,74 @@ class Mind():
 
 		if self.firstGeneration:
 			#Generate random DNA for the first generation
-			self.DNAlength = (self.inputCount * self.neuronsPerLayer + ((self.neuronsPerLayer * 
-				self.neuronsPerLayer) * self.numLayers) + self.neuronsPerLayer * self.outputNeurons)
+			self.DNAlength = (self.inputCount * self.neuronsPerLayer + self.neuronsPerLayer +
+				((self.neuronsPerLayer * self.neuronsPerLayer) * self.numLayers) + self.neuronsPerLayer * 
+				self.outputNeurons + self.neuronsPerLayer * self.numLayers + self.outputNeurons)
 			self.DNAbin = []
-			for i in range(0, self.DNAlength * 32):
+			for i in range(0, self.DNAlength * 12):
 				self.DNAbin.append(str(random.randint(0,1)))
-			self.b = BitArray(float=0.00, length=32)
+			self.b = BitArray(int=0, length=12)
 			self.DNAbin = ''.join(self.DNAbin)
 
 			self.DNA = []
-			for i in range(0, len(self.DNAbin), 32):
-				self.b.bin = self.DNAbin[i:i+32]
-				self.DNA.append([0.0 if math.isnan(self.b.float) else self.b.float])
+			for i in range(0, len(self.DNAbin), 12):
+				self.b.bin = self.DNAbin[i:i+12]
+				self.DNA.append(float(self.b.int))
 
-		#Convert DNA to weights
+		#Convert DNA to list of weights
 		self.weights = []
 		self.count = 0
+		#Normalise our converted DNA to floats between -0.5 and 0.5
+		self.DNA = (self.DNA-np.amin(self.DNA))/(np.amax(self.DNA)-np.amin(self.DNA)) - 0.5
+		#IMPORTANT QUESTION - SHOULDN'T IT BE NORMALISED BETWEEN MAX POSSIBLE VALUES, RATHER THAN MAX
+		#VALUES PRESENT? I THINK SO. -2048, 2047
+
+		#Convert list of weights into shaped arrays for each layer
+		#Input weights: inputCount x neuronsPerLayer matrix
 		self.l = np.array(self.DNA[self.count:self.count + self.inputCount*self.neuronsPerLayer])
 		self.count += self.inputCount*self.neuronsPerLayer
 		self.l = self.l.reshape(self.inputCount, self.neuronsPerLayer)
 		self.weights.append(self.l)
+		#Input activation weights: neuronsPerLayer array
+		self.l = np.array(self.DNA[self.count:self.count + self.neuronsPerLayer])
+		self.count += self.neuronsPerLayer
+		self.l = self.l.reshape(self.neuronsPerLayer)
+		self.weights.append(self.l)
+
 		for i in range(self.numLayers):
+			#Hidden layer weights: neuronsPerLayer x neuronsPerLayer matrix
 			self.l = np.array(self.DNA[self.count:self.count + self.neuronsPerLayer*self.neuronsPerLayer])
 			self.count += self.neuronsPerLayer*self.neuronsPerLayer
 			self.l = self.l.reshape(self.neuronsPerLayer, self.neuronsPerLayer)
 			self.weights.append(self.l)
+			#Hidden activation weights: neuronsPerLayer array
+			self.l = np.array(self.DNA[self.count:self.count + self.neuronsPerLayer])
+			self.count += self.neuronsPerLayer
+			self.l = self.l.reshape(self.neuronsPerLayer)
+			self.weights.append(self.l)
+		
+		#Output layer weights: neuronsPerLayer x outputNeruons matrix
 		self.l = np.array(self.DNA[self.count:self.count + self.outputNeurons*self.neuronsPerLayer])
 		self.l = self.l.reshape(self.neuronsPerLayer, self.outputNeurons)
 		self.weights.append(self.l)
 		self.count += self.neuronsPerLayer * self.outputNeurons
+		#Hidden activation weights: neuronsPerLayer array
+		self.l = np.array(self.DNA[self.count:self.count + self.neuronsPerLayer])
+		self.count += self.neuronsPerLayer
+		self.l = self.l.reshape(self.outputNeurons)
+		self.weights.append(self.l)
 
-		#Define Keras model of the brain, using sequential layers of activation neurons
+		#Define Keras model of the brain, using sequential layers of 'relu' activation neurons
+		#and the weights as structured above
 		self.model = Sequential()
 		self.model.add(Dense(self.neuronsPerLayer, input_shape = (self.inputCount,), activation='relu'))
 		for i in range(self.numLayers):
 			self.model.add(Dense(self.neuronsPerLayer, activation='relu'))
 		self.model.add(Dense(self.outputNeurons, activation='relu'))
-		#print self.weights
-		for arr in self.model.get_weights():
-			#print arr
-			print arr.shape
-		for arr in self.weights:
-			#print arr
-			print arr.shape
-		#self.model.set_weights(self.weights)
+		self.model.set_weights(self.weights)
 
 	def think(self, vision):
 		#Use the creatures Keras model and vision to determine direction/speed
-		vision = np.array([[element for sublist in vision for element in sublist]])
+		vision = np.array([[element for sublist in vision for element in sublist]]) #Flatten array
 		self.actions = self.model.predict(vision)
-		#print self.actions
 		return self.actions
