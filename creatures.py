@@ -91,21 +91,27 @@ class Creature(pygame.sprite.Sprite):
             else:
                 self.speed = self.baseSpeed
 
-            #Move: 
-            if int(round(action[1])) == 1: #action[1] = K_w
-                self.dy -= 1
-            if int(round(action[2])) == 1: #action[2] = K_a
-                self.dx -= 1
-            if int(round(action[3])) == 1: #action[2] = K_s
-                self.dy += 1
-            if int(round(action[4])) == 1: #action[2] = K_d
-                self.dx += 1
+            left, right, up, down, speed = False, False, False, False, False
+            self.dx, self.dy = 0, 0 #Reset speed
 
-            #Which 'keys' are no longer pressed?
-            if int(round(action[1])) == 0 and int(round(action[3])) == 0:
-                self.dy = 0
-            if int(round(action[2])) == 0 and int(round(action[4])) == 0:
-                self.dx = 0
+            #Establish 'buttons pressed': 
+            if int(round(action[1])) == 1: #action[1] = K_w
+                up = True
+            if int(round(action[2])) == 1: #action[2] = K_a
+                left = True
+            if int(round(action[3])) == 1: #action[2] = K_s
+                down = True
+            if int(round(action[4])) == 1: #action[2] = K_d
+                right = True
+
+            if up and not down:
+                self.dy = 1
+            if down and not up:
+                self.dy = -1
+            if left and not right:
+                self.dx = -1
+            if right and not left:
+                self.dx = 1
 
         self.rect.x += self.dx * self.speed
         self.rect.y += self.dy * self.speed
