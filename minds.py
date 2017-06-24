@@ -78,44 +78,16 @@ class Mind():
 		self.l = self.l.reshape(self.outputNeurons)
 		self.weights.append(self.l)
 
-
 		#Define Keras model of the brain, using sequential layers of activation neurons
 		self.model = Sequential()
-		self.model.add(Dense(self.neuronsPerLayer, input_shape = (self.inputCount,), activation='sigmoid'))
+		self.model.add(Dense(self.neuronsPerLayer, input_shape = (self.inputCount,), activation='relu'))
 		for i in range(self.numLayers):
-			self.model.add(Dense(self.neuronsPerLayer, activation='sigmoid'))
-		self.model.add(Dense(self.outputNeurons, activation='sigmoid'))
-		#print self.weights
-		for arr in self.model.get_weights():
-			#print arr
-			#print arr.shape
-			pass
-		for arr in self.weights:
-			print arr
-			#print arr.shape
-			pass
-		# weights = []
-		# # # weights.append(np.random.rand(25, 20))
-		# weights.append(np.random.uniform(low = -1, high = 1.0, size = (25, 20)))
-		# #weights.append(np.zeros(20,))
-		# weights.append(np.random.uniform(low = -1, high = 1.0, size = (20,)))
-		# # # weights.append(np.random.rand(20, 20))
-		# weights.append(np.random.uniform(low = -1, high = 1.0, size = (20, 20)))
-		# #weights.append(np.zeros(20,))
-		# weights.append(np.random.uniform(low = -1, high = 1.0, size = (20,)))
-		# # # weights.append(np.random.rand(20, 20))
-		# weights.append(np.random.uniform(low = -1, high = 1.0, size = (20, 20)))
-		# #weights.append(np.zeros(20,))
-		# weights.append(np.random.uniform(low = -1, high = 1.0, size = (20,)))
-		# # # weights.append(np.random.rand(20, 5))
-		# weights.append(np.random.uniform(low = -1, high = 1.0, size = (20, 5)))
-		# #weights.append(np.zeros(5,))
-		# weights.append(np.random.uniform(low = -1, high = 1.0, size = (5,)))
+			self.model.add(Dense(self.neuronsPerLayer, activation='relu'))
+		self.model.add(Dense(self.outputNeurons, activation='relu'))
 		self.model.set_weights(self.weights)
 
 	def think(self, vision):
 		#Use the creatures Keras model and vision to determine direction/speed
 		vision = np.array([[element for sublist in vision for element in sublist]])
 		self.actions = self.model.predict(vision)
-		#print self.actions
 		return self.actions
