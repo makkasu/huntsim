@@ -67,7 +67,7 @@ class Creature(pygame.sprite.Sprite):
 
         #Create blank DNA and attach a Mind object to our creature
         self.DNA = DNA
-        child = True if len(self.DNA) > 0 else False #children will have non-blank DNA strings
+        child = False if len(self.DNA) > 0 else True #children will have non-blank DNA strings
         self.mind = m.Mind(firstGeneration = child, DNA = DNA)
 
     def update(self):
@@ -86,7 +86,7 @@ class Creature(pygame.sprite.Sprite):
 
         for action in actions: 
             #Speed up: action[0] = K_SPACE
-            if int(round(action[0])) == 1::
+            if int(round(action[0])) == 1:
                 self.speed = self.topSpeed
             else:
                 self.speed = self.baseSpeed
@@ -102,9 +102,9 @@ class Creature(pygame.sprite.Sprite):
                 self.dx += 1
 
             #Which 'keys' are no longer pressed?
-            if int(round(action[1])) == 0 or int(round(action[3])) == 0:
+            if int(round(action[1])) == 0 and int(round(action[3])) == 0:
                 self.dy = 0
-            if int(round(action[2])) == 0 or int(round(action[4])) == 0:
+            if int(round(action[2])) == 0 and int(round(action[4])) == 0:
                 self.dx = 0
 
         self.rect.x += self.dx * self.speed
