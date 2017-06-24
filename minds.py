@@ -7,7 +7,7 @@ Description:
 """
 
 from keras.models import Sequential
-from keras.layers import Activation, Dense
+from keras.layers import Dense
 import random
 import numpy as np
 import math
@@ -36,14 +36,15 @@ class Mind():
 			self.DNA = []
 			for i in range(0, len(self.DNAbin), 12):
 				self.b.bin = self.DNAbin[i:i+12]
-				self.DNA.append([float(self.b.int) if math.isnan(self.b.int) else float(self.b.int)]) 
-				#Currently does nothing - replace first word with 1
+				self.DNA.append(float(self.b.int))
 
-		#Convert DNA to weights
+		#Convert DNA to list of weights
 		self.weights = []
 		self.count = 0
-		self.DNA = (self.DNA-np.amin(self.DNA))/(np.amax(self.DNA)-np.amin(self.DNA)) - 0.5 #TEST NORMALISATION - SEEMS TO WORK
+		#Normalise our converted DNA to floats between -0.5 and 0.5
+		self.DNA = (self.DNA-np.amin(self.DNA))/(np.amax(self.DNA)-np.amin(self.DNA)) - 0.5
 
+		#Convert list of weights into shaped arrays for each layer
 		#Input weights: inputCount x neuronsPerLayer matrix
 		self.l = np.array(self.DNA[self.count:self.count + self.inputCount*self.neuronsPerLayer])
 		self.count += self.inputCount*self.neuronsPerLayer
@@ -78,7 +79,8 @@ class Mind():
 		self.l = self.l.reshape(self.outputNeurons)
 		self.weights.append(self.l)
 
-		#Define Keras model of the brain, using sequential layers of activation neurons
+		#Define Keras model of the brain, using sequential layers of 'relu' activation neurons
+		#and the weights as structured above
 		self.model = Sequential()
 		self.model.add(Dense(self.neuronsPerLayer, input_shape = (self.inputCount,), activation='relu'))
 		for i in range(self.numLayers):
