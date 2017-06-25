@@ -1,10 +1,12 @@
 """
-Name: mapfuncs.py 
+Name: huntsim.py 
 Authors: Oliver Giles & Max Potter
 Date: June 2017
 Description:
     - Use pygame to create a simplistic model of a tiger hunting deer
     - Randomly generate a tile-based map 
+    - Populate the map with tigers and deer
+    - Tigers and deer have neural network 'brains' with 65 neurons each
 """
 
 import pygame
@@ -13,48 +15,15 @@ from pygame.locals import *
 import mapfuncs as mf
 import creatures as c
 from copy import deepcopy
-
-#Constants for colours
-orange = (242, 68, 56)
-yellow = (255,193,8)
-brown =(120, 84, 72)
-green =(76, 173, 80)
-white = (255, 255, 255)
-
-#Constants for tiles
-dirt = 0
-grass = 1
-wood = 2
-deer = 3
-tiger = 4
-
-#Colour to tile conversion
-colours = {
-            dirt : white,
-            grass : green,
-            wood : brown,
-            deer : yellow,
-            tiger : orange
-          }
-          
-#Game dimensions
-tileSize = 30 
-height = 20
-width = 30
+from settings import * #Various constants (such as the game dimensions) are stored here to reduce clutter
 
 #Create tilemap list
-minSeeds = 50
-maxSeeds = 50
 tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
 tilemapMaster = deepcopy(tilemap) #edits to sub arrays in tilemap won't edit tilemapMaster
 
 #Lists of objects
 tigerList = pygame.sprite.Group()
 deerList = pygame.sprite.Group()
-
-#Energy gained by eating deer or grass
-tigerEatEnergy = 50
-deerEatEnergy = 3
 
 #Initiate display
 pygame.init()
@@ -75,11 +44,9 @@ print "Meet the deer!"
 for i in range(10):
     tempCreature = c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
     print tempCreature[0].name
-
 print "\n"
 
 #Initialise a tiger
-tiger1, tigersprites = c.spawn_creature("tiger", pos=[150,100])
 print "And here come the tigers!"
 for i in range(5):
     tempCreature = c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize)
@@ -101,6 +68,7 @@ while not done:
     for tiger in c.tigerList:
         collision_list = pygame.sprite.spritecollide(tiger, c.deerList, True)
         for col in collision_list:
+            print "%s was eaten by %s!" % (col.name.rstrip(), tiger.name.rstrip())
             tiger.eat(tigerEatEnergy)
 
     #Gather all living sprites into one list
@@ -117,29 +85,14 @@ while not done:
      
     #Handle input events
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
-        tiger1.speed = tiger1.topSpeed
-    else:
-        tiger1.speed = tiger1.baseSpeed
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-
-        if event.type == KEYDOWN:
-            if event.key == K_w:
-                tiger1.dy -= 1
-            if event.key == K_a:
-                tiger1.dx -= 1
-            if event.key == K_s:
-                tiger1.dy += 1
-            if event.key == K_d:
-                tiger1.dx += 1
-        elif event.type == KEYUP:
-            if event.key == K_w or event.key == K_s:
-                tiger1.dy = 0
-            if event.key == K_a or event.key == K_d:
-                tiger1.dx = 0
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            for creature in cList:
+                if creature.rect.collidepoint(event.pos):
+                    print creature.name.rstrip(), creature.energy
 
     #Update display
     #Blit all living sprites on top of the background

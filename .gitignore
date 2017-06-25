@@ -8,3 +8,6 @@ settings.pyc
 creatures.pyc
 huntsim-legacy.pyc
 *.pyc
+creatures.pyc
+minds.pyc
+mapfuncs.pyc
