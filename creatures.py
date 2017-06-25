@@ -17,6 +17,8 @@ import genetic_algorithm as ga
 tigerList = pygame.sprite.Group()
 deerList = pygame.sprite.Group()
 
+deerSpeed = 0
+
 epoch = 1
 
 def load_png(name):
@@ -54,8 +56,8 @@ class Creature(pygame.sprite.Sprite):
         elif ctype == 'deer':
             self.image, self.rect = load_png('deer.png')
             self.add(deerList)
-            self.baseSpeed = 3
-            self.topSpeed = 5
+            self.baseSpeed = deerSpeed
+            self.topSpeed = deerSpeed*1.5
             self.energy = 200
             self.maxEnergy = 200
             self.drainRate = 2

@@ -101,8 +101,15 @@ while not done:
                     if creature.rect.collidepoint(event.pos):
                         print creature.name.rstrip(), creature.energy
             if event.type == pygame.KEYDOWN:
+                if event.key == K_EQUALS:
+                    c.deerSpeed += 1
+                    print "Deer speed increased to %d" % c.deerSpeed
+                if event.key == K_MINUS:
+                    c.deerSpeed = c.deerSpeed - 1 if c.deerSpeed > 0 else 0
+                    print "Deer speed decreased to %d" % c.deerSpeed
                 if event.key == K_LEFTBRACKET:
                     fps = fps - 10 if fps >= 0 else 1
+                    fps = fps if fps >= 1 else 1
                     print " * FPS = %d" % fps
                 if event.key == K_RIGHTBRACKET:
                     fps += 10
@@ -110,7 +117,6 @@ while not done:
                 if event.key == K_SPACE:
                     print " * PAUSED * "
                     pause = True
-
         #Check if there are enough tigers and deers. If not, create children
         if len(c.tigerList) < tigerPop:
             if len(ga.tGenepool) < 15:
@@ -181,10 +187,11 @@ while not done:
         #Update epoch if necessary
         epochCounter += 1
         if epochCounter >= 2000:
-            epochValue = 0
+            epochCounter = 0
+            epochValue += 1
             epochTime = time()
             c.epoch = epochValue
-            print 'Epoch:', epochValue
+            print ' *                            Epoch:', epochValue
 
     else:
         pygame.event.pump()
