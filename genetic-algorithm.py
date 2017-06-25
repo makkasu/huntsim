@@ -8,6 +8,14 @@ Description:
 
 import random
 
+#Lists of children waiting to be born
+tPregnancies = []
+dPregnancies = []
+
+#Lists of most fit parents
+tGenepool = []
+dGenepool = []
+
 def DNA_crossover(f, m):
 	numSplices = random.randint(5, 10)
 	spliceLocs = []
@@ -53,6 +61,8 @@ def mutate(DNA):
 	return DNA
 
 def breed(f, m):
+	#Select parents, with preference given to higher fitness scores
+	#...
 	DNA1, DNA2 = DNA_crossover(f, m)
 	DNA1 = mutate(DNA1)
 	DNA2 = mutate(DNA2)
