@@ -107,6 +107,7 @@ while not done:
                     fps += 10
                     print " * FPS = %d" % fps
                 if event.key == K_SPACE:
+                    print " * PAUSED * "
                     pause = True
 
         #Check if there are enough tigers and deers. If not, create children
@@ -192,4 +193,5 @@ while not done:
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == K_SPACE:
+                    print " * RESUMED * "
                     pause = False
