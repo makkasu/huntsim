@@ -22,7 +22,7 @@ idxList = ([0] * 15 + [1] * 14 + [2] * 13 + [3] * 12 + [4] * 11 +
 			[10] * 5 + [11] * 4 + [12] * 3 + [13] * 2 + [14] * 1)
 
 def DNA_crossover(f, m):
-	numSplices = random.randint(5, 10)
+	numSplices = random.randint(15, 35)
 	spliceLocs = []
 	DNA = ''
 	for i in range(numSplices):
@@ -55,7 +55,7 @@ def DNA_crossover(f, m):
 
 def mutate(DNA):
 	DNA = list(DNA)
-	numMutations = random.randint(1, 5)
+	numMutations = random.randint(100, 500)
 	for i in range(numMutations):
 		mutation = random.randint(0, (len(DNA) - 1))
 		if DNA[mutation] == '0':
@@ -104,16 +104,10 @@ def pool(fitness, DNA, ctype):
 	candidate parent. If so, add it to the list and if necessary sort
 	and trim the list to keep it at the appropriate size.
 	"""
-	print 'Deer gene pool/pregnancies'
-	print len(dGenepool)
-	print len(dPregnancies)
-	print 'Tiger gene pool/pregnancies'
-	print len(tGenepool)
-	print len(tPregnancies)
-
 	if ctype == "deer" and len(dGenepool) < 15:
 		dGenepool.append([fitness, DNA])
 		dGenepool.sort(key=lambda x: x[0], reverse=True)
+		print 'THE LENGTH OF DNA:', len(DNA)
 	elif ctype == "deer" and len(dGenepool) >= 15:
 		if fitness > dGenepool[14][0]:
 			dGenepool.append([fitness, DNA])
@@ -128,21 +122,3 @@ def pool(fitness, DNA, ctype):
 			tGenepool.append([fitness, DNA])
 			tGenepool.sort(key=lambda x: x[0], reverse=True)
 			del tGenepool[15:]
-
-
-#Add genepools for deer and tiger. 
-#Add a pool function which is called from huntim->creature and passes DNA, fitness and ctype
-#Add a select function which chooses two parents from genepool, weighted to select the top ones
-
-# f = '1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111'
-# m = '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
-
-# dna1, dna2 = breed(f, m)
-# print dna1, '\n', dna2
-# print len(dna1)
-# print dna1.count('1') 
-# print dna2.count('1')
-
-#Add parent_select function, and lists for deer/tigers which keep the top 15 or so DNA sequences.
-#parent_select chooses the two strings to mix
-#Each breed should produce 2 children (inverse of each other prior to mutation) so that all DNA is represented. 
