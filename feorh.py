@@ -27,7 +27,7 @@ tilemapMaster = deepcopy(tilemap) #edits to sub arrays in tilemap won't edit til
 pygame.init()
 display = pygame.display.set_mode((width * tileSize, height * tileSize))
 displayRect = display.get_rect()
-pygame.display.set_caption('Hunt Sim')
+pygame.display.set_caption('Feorh')
 
 #Draw the map
 bgSurface = pygame.Surface(display.get_size())
@@ -61,7 +61,7 @@ oldTigerPoints = []
 clock = pygame.time.Clock()
 
 #Initiliase epoch count
-epoch = 1
+epochValue = 1
 epochTime = time()
 
 #Main game loop
@@ -105,24 +105,24 @@ while not done:
             c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize)
             pass
         else:
-            if len(ga.tPregnancies > 0):
-                DNA = ga.getDNA("tiger")
+            if len(ga.tPregnancies) > 0:
+                DNA = ga.get_DNA("tiger")
                 c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
             else:
                 ga.breed("tiger")
-                DNA = ga.getDNA("tiger")
+                DNA = ga.get_DNA("tiger")
                 c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
 
     if len(c.deerList) < deerPop:
         if len(ga.dGenepool) < 15:
             c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
         else:
-            if len(ga.dPregnancies > 0):
-                DNA = ga.getDNA("deer")
+            if len(ga.dPregnancies) > 0:
+                DNA = ga.get_DNA("deer")
                 c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
             else:
                 ga.breed("deer")
-                DNA = ga.getDNA("deer")
+                DNA = ga.get_DNA("deer")
                 c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
 
     #Update display
@@ -168,5 +168,7 @@ while not done:
 
     #Update epoch if necessary
     if time() - epochTime >= 200:
-        epoch += 1
+        epochValue += 1
         epochTime = time()
+        c.epoch = epochValue
+        print 'Epoch:', epochValue

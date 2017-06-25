@@ -30,10 +30,17 @@ class Mind():
 			self.DNAbin = []
 			for i in range(0, self.DNAlength * 12):
 				self.DNAbin.append(str(random.randint(0,1)))
-			self.b = BitArray(int=0, length=12)
+			
 			self.DNAbin = ''.join(self.DNAbin)
-
+			self.b = BitArray(int=0, length=12)
 			self.DNA = []
+			for i in range(0, len(self.DNAbin), 12):
+				self.b.bin = self.DNAbin[i:i+12]
+				self.DNA.append(float(self.b.int))
+		else:
+			self.DNAbin = self.DNA
+			self.DNA = []
+			self.b = BitArray(int=0, length=12)
 			for i in range(0, len(self.DNAbin), 12):
 				self.b.bin = self.DNAbin[i:i+12]
 				self.DNA.append(float(self.b.int))

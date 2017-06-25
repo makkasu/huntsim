@@ -10,10 +10,14 @@ import pygame
 from pygame.locals import *
 from random import randint, choice
 import minds as m
+from time import time
+import genetic_algorithm as ga
 
 #Lists of objects
 tigerList = pygame.sprite.Group()
 deerList = pygame.sprite.Group()
+
+epoch = 1
 
 def load_png(name):
 	image = pygame.image.load(name)
@@ -42,15 +46,19 @@ class Creature(pygame.sprite.Sprite):
             self.add(tigerList)
             self.baseSpeed = 2
             self.topSpeed = 10
-            self.energy = 1500
+            self.energy = 500
             self.drainRate = 1
+            self.birthsecond = time()
+            self.age = 0.0
         elif ctype == 'deer':
             self.image, self.rect = load_png('deer.png')
             self.add(deerList)
             self.baseSpeed = 2
             self.topSpeed = 3
-            self.energy = 1000
+            self.energy = 500
             self.drainRate = 2
+            self.birthsecond = time()
+            self.age = 0.0
 
         #Set up display information
         screen = pygame.display.get_surface()
@@ -69,18 +77,19 @@ class Creature(pygame.sprite.Sprite):
         self.DNA = DNA
         child = False if len(self.DNA) > 0 else True #children will have non-blank DNA strings
         self.mind = m.Mind(firstGeneration = child, DNA = DNA)
+        self.DNA = self.mind.DNAbin
 
     def update(self):
         #Deplete energy and check if still alive!
         self.energy -= self.drainRate
         if self.energy <= 0:
-            self.die()  
-            if self.ctype == 'tiger':
-                #*********************************************PASS ON DNA!!!!
-                tigerList.remove(self)
-            if self.ctype == 'deer':
-                #*********************************************PASS ON DNA!!!!
-                deerList.remove(self)
+            self.die()
+
+        self.age = time() - self.birthsecond
+
+        if self.ctype == "deer":
+            if self.age >= 150:
+                self.die()
 
         #Feed vision into neural network and retrieve button presses
         actions = self.mind.think(self.vision)
@@ -96,13 +105,13 @@ class Creature(pygame.sprite.Sprite):
             self.dx, self.dy = 0, 0 #Reset speed
 
             #Establish 'buttons pressed': 
-            if int(round(action[1])) == 1: #action[1] = K_w
+            if int(round(action[1])) == 1:
                 up = True
-            if int(round(action[2])) == 1: #action[2] = K_a
+            if int(round(action[2])) == 1:
                 left = True
-            if int(round(action[3])) == 1: #action[2] = K_s
+            if int(round(action[3])) == 1:
                 down = True
-            if int(round(action[4])) == 1: #action[2] = K_d
+            if int(round(action[4])) == 1:
                 right = True
 
             if up and not down:
@@ -129,8 +138,16 @@ class Creature(pygame.sprite.Sprite):
         print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
             self.name.rstrip())
 
+        if self.ctype == 'tiger':
+            fitness = self.age
+            ga.pool(fitness, self.DNA, self.ctype)
+            tigerList.remove(self)
+        if self.ctype == 'deer':
+            fitness = self.age * epoch
+            ga.pool(fitness, self.DNA, self.ctype)
+            deerList.remove(self)
 
-def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1]):
+def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1], DNA=''):
     """
     Initialises instance of a creature of type ctype.
     In absence of pos argument, spawn location is randomly generated based on height & width.
@@ -146,7 +163,7 @@ def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1
     if pos[0] < 0 and pos[1] < 0: 
         pos = [0,0]
 
-    newCreature = Creature(pos, ctype)
+    newCreature = Creature(pos, ctype, DNA)
     newSprite = pygame.sprite.RenderPlain(newCreature)
 
     return newCreature, newSprite
