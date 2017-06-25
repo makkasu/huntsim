@@ -44,18 +44,20 @@ class Creature(pygame.sprite.Sprite):
         if ctype == 'tiger':
             self.image, self.rect = load_png('tiger.png')
             self.add(tigerList)
-            self.baseSpeed = 2
+            self.baseSpeed = 3
             self.topSpeed = 10
-            self.energy = 500
+            self.energy = 300
+            self.maxEnergy = 300
             self.drainRate = 1
             self.birthsecond = time()
             self.age = 0.0
         elif ctype == 'deer':
             self.image, self.rect = load_png('deer.png')
             self.add(deerList)
-            self.baseSpeed = 2
-            self.topSpeed = 3
-            self.energy = 500
+            self.baseSpeed = 3
+            self.topSpeed = 5
+            self.energy = 200
+            self.maxEnergy = 200
             self.drainRate = 2
             self.birthsecond = time()
             self.age = 0.0
@@ -132,7 +134,8 @@ class Creature(pygame.sprite.Sprite):
         return choice(list(open('names.txt')))
 
     def eat(self, eatEnergy):
-        self.energy += eatEnergy
+        if self.energy < self.maxEnergy:
+            self.energy += eatEnergy
 
     def die(self):
         print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
@@ -143,7 +146,7 @@ class Creature(pygame.sprite.Sprite):
             ga.pool(fitness, self.DNA, self.ctype)
             tigerList.remove(self)
         if self.ctype == 'deer':
-            fitness = self.age * epoch
+            fitness = self.age + 5.0 * epoch
             ga.pool(fitness, self.DNA, self.ctype)
             deerList.remove(self)
 
