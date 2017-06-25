@@ -14,7 +14,7 @@ import math
 from bitstring import BitArray
 
 class Mind():
-	def __init__(self, numTiles=25, neuronsPerLayer=20, numLayers=2, firstGeneration=False, DNA=''):
+	def __init__(self, numTiles=26, neuronsPerLayer=20, numLayers=2, firstGeneration=False, DNA=''):
 		self.inputCount = numTiles
 		self.neuronsPerLayer = neuronsPerLayer
 		self.firstGeneration = firstGeneration
@@ -99,6 +99,10 @@ class Mind():
 
 	def think(self, vision):
 		#Use the creatures Keras model and vision to determine direction/speed
+		impulse = random.randint(-5,5)
+		tempList = []
+		tempList.append(impulse)
+		vision.append(tempList)
 		vision = np.array([[element for sublist in vision for element in sublist]]) #Flatten array
 		self.actions = self.model.predict(vision)
 		return self.actions

@@ -20,8 +20,8 @@ white = (255, 255, 255)
 dirt = 0
 grass = 1
 wood = 2
-deer = 3
-tiger = 4
+deer = 5
+tiger = 8
 
 #Colour to tile conversion
 colours = {
