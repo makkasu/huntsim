@@ -68,6 +68,7 @@ while not done:
     for tiger in c.tigerList:
         collision_list = pygame.sprite.spritecollide(tiger, c.deerList, True)
         for col in collision_list:
+            print "%s was eaten by %s!" % (col.name.rstrip(), tiger.name.rstrip())
             tiger.eat(tigerEatEnergy)
 
     #Gather all living sprites into one list
@@ -88,6 +89,10 @@ while not done:
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            for creature in cList:
+                if creature.rect.collidepoint(event.pos):
+                    print creature.name.rstrip(), creature.energy
 
     #Update display
     #Blit all living sprites on top of the background

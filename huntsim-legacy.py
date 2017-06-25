@@ -158,3 +158,4 @@ class Creature(pygame.sprite.Sprite):
 
     def eat(self, eatEnergy):
         self.energy += eatEnergy
+

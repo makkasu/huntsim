@@ -74,6 +74,7 @@ class Creature(pygame.sprite.Sprite):
         #Deplete energy and check if still alive!
         self.energy -= self.drainRate
         if self.energy <= 0:
+            self.die()  
             if self.ctype == 'tiger':
                 #*********************************************PASS ON DNA!!!!
                 tigerList.remove(self)
@@ -123,6 +124,10 @@ class Creature(pygame.sprite.Sprite):
 
     def eat(self, eatEnergy):
         self.energy += eatEnergy
+
+    def die(self):
+        print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
+            self.name.rstrip())
 
 
 def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1]):
