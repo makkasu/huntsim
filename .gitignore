@@ -1,0 +1,10 @@
+
+huntsim.pyc
+settings.pyc
+mapfuncs.pyc
+minds.pyc
+genetic-algorithm.pyc
+settings.pyc
+creatures.pyc
+huntsim-legacy.pyc
+*.pyc
