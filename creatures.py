@@ -88,7 +88,6 @@ class Creature(pygame.sprite.Sprite):
             self.die()
 
         self.age = time() - self.birthsecond
-
         if self.ctype == "deer":
             if self.age >= 150:
                 self.die()
@@ -140,7 +139,6 @@ class Creature(pygame.sprite.Sprite):
     def die(self):
         print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
             self.name.rstrip())
-
         if self.ctype == 'tiger':
             fitness = self.age
             ga.pool(fitness, self.DNA, self.ctype)
