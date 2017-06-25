@@ -6,6 +6,9 @@ Description:
     - Stores the various parameters of the game
 """
 
+#Starting framerate
+fps = 10
+
 #Constants for colours
 orange = (242, 68, 56)
 yellow = (255,193,8)
