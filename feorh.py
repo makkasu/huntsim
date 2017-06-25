@@ -67,6 +67,7 @@ epochTime = time()
 #Main game loop
 done = False
 pause = False
+epochCounter = 0
 while not done:
     clock.tick(fps) # limit fps
 
@@ -161,9 +162,9 @@ while not done:
             #Update tilemap to reflect what creatures are on each tiles - tigers trump deer
             if creature.ctype == "tiger" and tilemapMaster != wood: #tigers are invisible in the forest
                 tigerPoints.append([i,j])
-                tilemap[i][j] = 4
+                tilemap[i][j] = 8
             elif creature.ctype == "deer" and tilemap[i][j] != tiger: 
-                tilemap[i][j] = 3
+                tilemap[i][j] = 5
                 deerPoints.append([i,j])
                 if tilemapMaster[i][j] == grass: #don't forget to feed the deer!
                     creature.eat(deerEatEnergy)
@@ -178,8 +179,9 @@ while not done:
         oldTigerPoints = tigerPoints
 
         #Update epoch if necessary
-        if time() - epochTime >= 200:
-            epochValue += 1
+        epochCounter += 1
+        if epochCounter >= 2000:
+            epochValue = 0
             epochTime = time()
             c.epoch = epochValue
             print 'Epoch:', epochValue

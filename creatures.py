@@ -73,7 +73,7 @@ class Creature(pygame.sprite.Sprite):
         self.dy = 0
 
         #Set up default vision (5x5 grid, all seeing 'off map')
-        self.vision = [[-1 for column in range(5)] for row in range(5)]
+        self.vision = [[-10 for column in range(5)] for row in range(5)]
 
         #Create blank DNA and attach a Mind object to our creature
         self.DNA = DNA
