@@ -1,5 +1,5 @@
 """
-Name: huntsim.py 
+Name: feorh.py 
 Authors: Oliver Giles & Max Potter
 Date: June 2017
 Description:
@@ -14,22 +14,20 @@ import sys
 from pygame.locals import *
 import mapfuncs as mf
 import creatures as c
+import genetic_algorithm as ga
 from copy import deepcopy
 from settings import * #Various constants (such as the game dimensions) are stored here to reduce clutter
+from time import time
 
 #Create tilemap list
 tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
 tilemapMaster = deepcopy(tilemap) #edits to sub arrays in tilemap won't edit tilemapMaster
 
-#Lists of objects
-tigerList = pygame.sprite.Group()
-deerList = pygame.sprite.Group()
-
 #Initiate display
 pygame.init()
 display = pygame.display.set_mode((width * tileSize, height * tileSize))
 displayRect = display.get_rect()
-pygame.display.set_caption('Hunt Sim')
+pygame.display.set_caption('Feorh')
 
 #Draw the map
 bgSurface = pygame.Surface(display.get_size())
@@ -40,15 +38,18 @@ bgSurface = bgSurface.convert()
 display.blit(bgSurface,(0,0)) # blit the map to the screen
 
 #Initialise some deer at random locations
+deerPop = 10
+tigerPop = 5
+
 print "Meet the deer!"
-for i in range(10):
+for i in range(deerPop):
     tempCreature = c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
     print tempCreature[0].name
 print "\n"
 
 #Initialise a tiger
 print "And here come the tigers!"
-for i in range(5):
+for i in range(tigerPop):
     tempCreature = c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize)
     print tempCreature[0].name
 
@@ -58,6 +59,10 @@ oldTigerPoints = []
 
 #Initialise clock
 clock = pygame.time.Clock()
+
+#Initiliase epoch count
+epochValue = 1
+epochTime = time()
 
 #Main game loop
 done = False
@@ -93,6 +98,32 @@ while not done:
             for creature in cList:
                 if creature.rect.collidepoint(event.pos):
                     print creature.name.rstrip(), creature.energy
+
+    #Check if there are enough tigers and deers. If not, create children
+    if len(c.tigerList) < tigerPop:
+        if len(ga.tGenepool) < 15:
+            c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize)
+            pass
+        else:
+            if len(ga.tPregnancies) > 0:
+                DNA = ga.get_DNA("tiger")
+                c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
+            else:
+                ga.breed("tiger")
+                DNA = ga.get_DNA("tiger")
+                c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
+
+    if len(c.deerList) < deerPop:
+        if len(ga.dGenepool) < 15:
+            c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
+        else:
+            if len(ga.dPregnancies) > 0:
+                DNA = ga.get_DNA("deer")
+                c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
+            else:
+                ga.breed("deer")
+                DNA = ga.get_DNA("deer")
+                c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
 
     #Update display
     #Blit all living sprites on top of the background
@@ -134,3 +165,10 @@ while not done:
 
     oldDeerPoints = deerPoints
     oldTigerPoints = tigerPoints
+
+    #Update epoch if necessary
+    if time() - epochTime >= 200:
+        epochValue += 1
+        epochTime = time()
+        c.epoch = epochValue
+        print 'Epoch:', epochValue

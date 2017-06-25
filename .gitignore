@@ -2,5 +2,8 @@
 *.pyc
 minds.pyc
 mapfuncs.pyc
-minds.pyc
-*.pyc
+huntsim.pyc
+settings.pyc
+genetic-algorithm.pyc
+creatures.pyc
+huntsim-legacy.pyc
