@@ -19,6 +19,16 @@ from copy import deepcopy
 from settings import * #Various constants (such as the game dimensions) are stored here to reduce clutter
 from time import time
 
+#Open the output file
+f = open('bestTigers.txt', 'w')
+f.write("epoch,name,fitness,DNA\n")
+
+def quit_game():
+    f.close()
+    pygame.quit()
+    sys.exit()
+    return
+
 #Create tilemap list
 tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
 tilemapMaster = deepcopy(tilemap) #edits to sub arrays in tilemap won't edit tilemapMaster
@@ -76,7 +86,7 @@ while not done:
         for tiger in c.tigerList:
             collision_list = pygame.sprite.spritecollide(tiger, c.deerList, True)
             for col in collision_list:
-                print "%s was eaten by %s!" % (col.name.rstrip(), tiger.name.rstrip())
+                # print "%s was eaten by %s!" % (col.name.rstrip(), tiger.name.rstrip())
                 tiger.eat(tigerEatEnergy)
 
         #Gather all living sprites into one list
@@ -94,8 +104,7 @@ while not done:
         #Handle input events
         for event in pygame.event.get():
             if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
+                quit_game()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for creature in cList:
                     if creature.rect.collidepoint(event.pos):
@@ -117,6 +126,7 @@ while not done:
                 if event.key == K_SPACE:
                     print " * PAUSED * "
                     pause = True
+
         #Check if there are enough tigers and deers. If not, create children
         if len(c.tigerList) < tigerPop:
             if len(ga.tGenepool) < 15:
@@ -143,10 +153,13 @@ while not done:
                     DNA = ga.get_DNA("deer")
                     c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
 
-        #Update display
-        #Blit all living sprites on top of the background
+        #Kill any creature that walks off the map
         for creature in cList:
-            creature.rect.clamp_ip(displayRect)
+            if not displayRect.colliderect(creature.rect):
+                # print "***********************              %s went off the map!" % (creature.name.rstrip())
+                creature.die()
+
+        #Update display
         #update background to cover up dead (unupdated) sprites
         display.blit(bgSurface,(0,0))
         for creature in cList:
@@ -180,13 +193,16 @@ while not done:
         emptyTiles.extend([point for point in oldDeerPoints if point not in deerPoints])
         for tile in emptyTiles:
             tilemap[tile[0]][tile[1]] = tilemapMaster[tile[0]][tile[1]]
-
         oldDeerPoints = deerPoints
         oldTigerPoints = tigerPoints
 
         #Update epoch if necessary
         epochCounter += 1
         if epochCounter >= 2000:
+            #Dump current best tiger list 
+            for i,t in enumerate(c.bestTigerList):
+                f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
+            c.bestTigerList = []
             epochCounter = 0
             epochValue += 1
             epochTime = time()
@@ -198,8 +214,7 @@ while not done:
 
         for event in pygame.event.get():
             if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
+                quit_game()
             if event.type == pygame.KEYDOWN:
                 if event.key == K_SPACE:
                     print " * RESUMED * "

@@ -18,7 +18,7 @@ tigerList = pygame.sprite.Group()
 deerList = pygame.sprite.Group()
 
 deerSpeed = 0
-
+bestTigerList = []
 epoch = 1
 
 def load_png(name):
@@ -139,11 +139,15 @@ class Creature(pygame.sprite.Sprite):
             self.energy += eatEnergy
 
     def die(self):
-        print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
-            self.name.rstrip())
+        # print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
+        #     self.name.rstrip())
         if self.ctype == 'tiger':
             fitness = self.age
             ga.pool(fitness, self.DNA, self.ctype)
+            for t in ga.tGenepool: #record best performing tigers
+                if t[1] == self.DNA:
+                    bestTigerList.append([epoch, self.name, fitness, self.DNA])
+                    continue
             tigerList.remove(self)
         if self.ctype == 'deer':
             fitness = self.age + 5.0 * epoch
