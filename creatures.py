@@ -12,6 +12,7 @@ from random import randint, choice
 import minds as m
 from time import time
 import genetic_algorithm as ga
+from sys import getrefcount
 
 #Lists of objects
 tigerList = pygame.sprite.Group()
@@ -61,7 +62,7 @@ class Creature(pygame.sprite.Sprite):
             self.energy = 200
             self.maxEnergy = 200
             self.drainRate = 2
-            self.birthsecond = time()
+            #self.birthsecond = time()
             self.age = 0.0
 
         #Set up display information
@@ -89,9 +90,9 @@ class Creature(pygame.sprite.Sprite):
         if self.energy <= 0:
             self.die()
 
-        self.age = time() - self.birthsecond
+        self.age += 1
         if self.ctype == "deer":
-            if self.age >= 150:
+            if self.age >= 300:
                 self.die()
 
         #Feed vision into neural network and retrieve button presses
@@ -152,6 +153,8 @@ class Creature(pygame.sprite.Sprite):
         if self.ctype == 'deer':
             fitness = self.age + 5.0 * epoch
             ga.pool(fitness, self.DNA, self.ctype)
+            print 'References to mind:', getrefcount(self.mind)
+            print 'References to self:', getrefcount(self)
             deerList.remove(self)
 
 def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1], DNA=''):

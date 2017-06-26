@@ -14,7 +14,7 @@ import math
 from bitstring import BitArray
 
 class Mind():
-	def __init__(self, numTiles=26, neuronsPerLayer=20, numLayers=2, firstGeneration=False, DNA=''):
+	def __init__(self, numTiles=26, neuronsPerLayer=15, numLayers=1, firstGeneration=False, DNA=''):
 		self.inputCount = numTiles
 		self.neuronsPerLayer = neuronsPerLayer
 		self.firstGeneration = firstGeneration
