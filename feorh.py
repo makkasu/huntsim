@@ -201,6 +201,7 @@ while not done:
         if epochCounter >= 2000:
             #Dump current best tiger list 
             for i,t in enumerate(c.bestTigerList):
+                print "New tiger %s added to bestTigers.txt! Fitness = %d." % (t[1].rstrip(), t[2])
                 f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
             c.bestTigerList = []
             epochCounter = 0

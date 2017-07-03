@@ -153,8 +153,8 @@ class Creature(pygame.sprite.Sprite):
         if self.ctype == 'deer':
             fitness = self.age + 5.0 * epoch
             ga.pool(fitness, self.DNA, self.ctype)
-            print 'References to mind:', getrefcount(self.mind)
-            print 'References to self:', getrefcount(self)
+            # print 'References to mind:', getrefcount(self.mind)
+            # print 'References to self:', getrefcount(self)
             deerList.remove(self)
 
 def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1], DNA=''):
