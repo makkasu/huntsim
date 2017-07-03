@@ -80,7 +80,8 @@ class Creature(pygame.sprite.Sprite):
         self.tiles = [] #blank list to store all visited tiles
 
         #Set up default vision (5x5 grid, all seeing 'off map')
-        self.vision = [[wall for column in range(5)] for row in range(5)]
+        # self.vision = [[wall for column in range(5)] for row in range(5
+        self.vision = [wall,wall,wall,wall,wall]
 
         #Create blank DNA and attach a Mind object to our creature
         self.DNA = DNA
@@ -96,7 +97,7 @@ class Creature(pygame.sprite.Sprite):
 
         self.age += 1
         if self.ctype == "deer":
-            if self.age >= 300:
+            if self.age >= 1500:
                 self.die()
 
         #Feed vision into neural network and retrieve button presses

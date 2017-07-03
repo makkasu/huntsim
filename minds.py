@@ -14,7 +14,7 @@ import math
 from bitstring import BitArray
 
 class Mind():
-	def __init__(self, numTiles=26, neuronsPerLayer=15, numLayers=1, firstGeneration=False, DNA=''):
+	def __init__(self, numTiles=6, neuronsPerLayer=20, numLayers=2, firstGeneration=False, DNA=''):
 		self.inputCount = numTiles
 		self.neuronsPerLayer = neuronsPerLayer
 		self.firstGeneration = firstGeneration
@@ -50,8 +50,6 @@ class Mind():
 		self.count = 0
 		#Normalise our converted DNA to floats between -0.5 and 0.5
 		self.DNA = 2*(self.DNA-np.float32(-2048))/(np.float32(2047)-np.float32(-2048)) - 1
-		#IMPORTANT QUESTION - SHOULDN'T IT BE NORMALISED BETWEEN MAX POSSIBLE VALUES, RATHER THAN MAX
-		#VALUES PRESENT? I THINK SO. -2048, 2047
 
 		#Convert list of weights into shaped arrays for each layer
 		#Input weights: inputCount x neuronsPerLayer matrix
@@ -103,7 +101,10 @@ class Mind():
 		tempList = []
 		tempList.append(impulse)
 		# vision = np.array([tempList])
-		vision.append(tempList)
-		vision = np.array([[element for sublist in vision for element in sublist]]) #Flatten array
-		self.actions = self.model.predict(vision)
+		vision.append(impulse)
+		# print vision
+		vision2 = np.array([vision]) #Flatten array
+		# print vision2
+		# print "\n\n"
+		self.actions = self.model.predict(vision2)
 		return self.actions

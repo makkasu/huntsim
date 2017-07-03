@@ -80,4 +80,22 @@ def get_vision(i, j, tilemap, height, width):
 
 			vision[idx][jdx] = tilemap[i - 2 + idx][j - 2 + jdx]
 
-	return vision
+	# ********* THIS VISION CODE IS ONLY FOR TIGERS - WHEN DEER START MOVING, REWORK!
+	up = [vision[1][0],vision[2][0],vision[3][0],vision[1][1],vision[2][1],vision[3][1]]
+	down = [vision[1][3],vision[2][3],vision[3][3],vision[1][4],vision[2][4],vision[3][4]]
+	left = [vision[0][1],vision[0][2],vision[0][3],vision[1][1],vision[1][2],vision[1][3]]
+	right = [vision[3][1],vision[3][2],vision[3][3],vision[4][1],vision[4][2],vision[4][3]]
+	centre = vision[2][2]
+
+	directions = [up,down,left,right]
+	vision2 = []
+	for direction in directions:
+		if deerColour in direction:
+			vision2.append(deerColour)
+		elif wall in direction:
+			vision2.append(wall)
+		else:
+			vision2.append(max(set(direction), key=direction.count))
+	vision2.append(centre)
+
+	return vision2

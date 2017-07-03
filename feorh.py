@@ -98,7 +98,7 @@ while not done:
         for creature in cList:
             i, j = mf.find_tile(creature, tileSize, height, width)
             creature.vision = mf.get_vision(i, j, tilemap, height, width)
-            creature.vision[2][2] = tilemapMaster[i][j] #stop the tiger seeing itself in the centre square
+            creature.vision[4] = tilemapMaster[i][j] #stop the tiger seeing itself in the centre square
             # if creature.ctype == "tiger":
             #     print '\n'
             #     print('\n'.join([''.join(['{:4}'.format(item) for item in row]) for row in creature.vision]))
