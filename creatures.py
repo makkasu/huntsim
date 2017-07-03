@@ -13,6 +13,7 @@ import minds as m
 from time import time
 import genetic_algorithm as ga
 from sys import getrefcount
+from settings import *
 
 #Lists of objects
 tigerList = pygame.sprite.Group()
@@ -79,7 +80,7 @@ class Creature(pygame.sprite.Sprite):
         self.tiles = [] #blank list to store all visited tiles
 
         #Set up default vision (5x5 grid, all seeing 'off map')
-        self.vision = [[-10 for column in range(5)] for row in range(5)]
+        self.vision = [[wall for column in range(5)] for row in range(5)]
 
         #Create blank DNA and attach a Mind object to our creature
         self.DNA = DNA

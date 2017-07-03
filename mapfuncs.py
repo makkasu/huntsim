@@ -8,6 +8,7 @@ Description:
 """
 
 from random import randint, choice
+from settings import *
 
 def create_map(width, height, minSeeds, maxSeeds):
 	"""
@@ -20,7 +21,7 @@ def create_map(width, height, minSeeds, maxSeeds):
 	seedList = []
 	for i in range(seedNumber):
 	    point = (randint(0,height),randint(0,width))
-	    typeList = [0] * 4 + [1] * 2 + [2] * 1 # weighted list of types
+	    typeList = [dirt] * 4 + [grass] * 2 + [wood] * 1 # weighted list of types
 	    seedType = choice(typeList)
 	    seedList.append((point,seedType)) # add a seed at a random point with a random type to the list
 	#For all tiles, which seed type is closest? Adopt that type.
@@ -65,7 +66,7 @@ def get_vision(i, j, tilemap, height, width):
 	Takes tilemap and indicies, returns 5x5 section of tilemap centred on (i,j).
 	"""
 	#Set up 5x5 array, every element is -1 (which will indicate 'seeing off map')
-	vision = [[-1 for column in range(5)] for row in range(5)]
+	vision = [[wall for column in range(5)] for row in range(5)]
 
 	for idx in range(5):
 		for jdx in range(5):

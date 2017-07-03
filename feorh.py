@@ -32,6 +32,7 @@ def quit_game():
 
 #Create tilemap list
 tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
+print tilemap
 tilemapMaster = deepcopy(tilemap) #edits to sub arrays in tilemap won't edit tilemapMaster
 
 #Initiate display
@@ -187,11 +188,11 @@ while not done:
                 creature.tiles.append((i,j))
 
             #Update tilemap to reflect what creatures are on each tiles - tigers trump deer
-            if creature.ctype == "tiger" and tilemapMaster != wood: #tigers are invisible in the forest
+            if creature.ctype == "tiger" and tilemapMaster[i][j] != wood: #tigers are invisible in the forest
                 tigerPoints.append([i,j])
-                tilemap[i][j] = 8
-            elif creature.ctype == "deer" and tilemap[i][j] != tiger: 
-                tilemap[i][j] = 5
+                tilemap[i][j] = tigerColour
+            elif creature.ctype == "deer" and tilemap[i][j] != tigerColour: 
+                tilemap[i][j] = deerColour
                 deerPoints.append([i,j])
                 if tilemapMaster[i][j] == grass: #don't forget to feed the deer!
                     creature.eat(deerEatEnergy)

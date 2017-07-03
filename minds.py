@@ -49,7 +49,7 @@ class Mind():
 		self.weights = []
 		self.count = 0
 		#Normalise our converted DNA to floats between -0.5 and 0.5
-		self.DNA = (self.DNA-np.amin(self.DNA))/(np.amax(self.DNA)-np.amin(self.DNA)) - 0.5
+		self.DNA = 2*(self.DNA-np.float32(-2048))/(np.float32(2047)-np.float32(-2048)) - 1
 		#IMPORTANT QUESTION - SHOULDN'T IT BE NORMALISED BETWEEN MAX POSSIBLE VALUES, RATHER THAN MAX
 		#VALUES PRESENT? I THINK SO. -2048, 2047
 
@@ -99,9 +99,10 @@ class Mind():
 
 	def think(self, vision):
 		#Use the creatures Keras model and vision to determine direction/speed
-		impulse = random.randint(-5,5)
+		impulse = np.float32(2*random.random() - 1)
 		tempList = []
 		tempList.append(impulse)
+		# vision = np.array([tempList])
 		vision.append(tempList)
 		vision = np.array([[element for sublist in vision for element in sublist]]) #Flatten array
 		self.actions = self.model.predict(vision)
