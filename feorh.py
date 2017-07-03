@@ -51,17 +51,17 @@ display.blit(bgSurface,(0,0)) # blit the map to the screen
 deerPop = 10
 tigerPop = 5
 
+#Initialise tigers, then deers
+print "Here come the tigers!"
+for i in range(tigerPop):
+    tempCreature = c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize)
+    print tempCreature[0].name
+
 print "Meet the deer!"
 for i in range(deerPop):
     tempCreature = c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
     print tempCreature[0].name
 print "\n"
-
-#Initialise a tiger
-print "And here come the tigers!"
-for i in range(tigerPop):
-    tempCreature = c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize)
-    print tempCreature[0].name
 
 #Initialise blank lists for previous tiger and deer positions on the map
 oldDeerPoints = []

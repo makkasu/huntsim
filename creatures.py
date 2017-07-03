@@ -169,10 +169,23 @@ def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1
     """
     #if pos is unchanged by user then randomly generate a position
     if pos == [-1,-1]: 
+        acceptable = False
         rangeX = (mapWidth-1)*tileSize
         rangeY = (mapHeight-1)*tileSize
         pos = [randint(0,rangeX), randint(0,rangeY)]
-    
+
+    if ctype == 'deer':
+        while not acceptable:
+            acceptable = True #Tentatively assume the spawn is suitable...
+
+            #Check the spawn against tiger positions to ensure they do not spawn too closely
+            for tiger in tigerList:
+                if rangeX < (tiger.rect.centerx + 15) and rangeX > (tiger.rect.centerx - 15):
+                    acceptable = False #Too close to tiger
+                    rangeX = (mapWidth-1)*tileSize
+                    rangeY = (mapHeight-1)*tileSize
+                    pos = [randint(0,rangeX), randint(0,rangeY)]
+        
     #if pos argument is passed but invalid, make it [0,0]
     if pos[0] < 0 and pos[1] < 0: 
         pos = [0,0]
