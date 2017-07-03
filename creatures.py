@@ -54,6 +54,7 @@ class Creature(pygame.sprite.Sprite):
             self.drainRate = 1
             self.birthsecond = time()
             self.age = 0.0
+            self.killCount = 0
         elif ctype == 'deer':
             self.image, self.rect = load_png('deer.png')
             self.add(deerList)
@@ -74,6 +75,7 @@ class Creature(pygame.sprite.Sprite):
         self.speed = self.baseSpeed
         self.dx = 0
         self.dy = 0
+        self.tiles = [] #blank list to store all visited tiles
 
         #Set up default vision (5x5 grid, all seeing 'off map')
         self.vision = [[-10 for column in range(5)] for row in range(5)]
@@ -138,6 +140,8 @@ class Creature(pygame.sprite.Sprite):
     def eat(self, eatEnergy):
         if self.energy < self.maxEnergy:
             self.energy += eatEnergy
+        if self.ctype == 'tiger':
+            self.killCount += 1
 
     def die(self):
         # print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
@@ -153,8 +157,8 @@ class Creature(pygame.sprite.Sprite):
         if self.ctype == 'deer':
             fitness = self.age + 5.0 * epoch
             ga.pool(fitness, self.DNA, self.ctype)
-            print 'References to mind:', getrefcount(self.mind)
-            print 'References to self:', getrefcount(self)
+            # print 'References to mind:', getrefcount(self.mind)
+            # print 'References to self:', getrefcount(self)
             deerList.remove(self)
 
 def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1], DNA=''):

@@ -175,8 +175,15 @@ while not done:
         tigerPoints = []
         deerPoints = []
         for creature in cList:
-            #what tile is the creature on?
+            #what tile is the creature on? If it stands on a tile not previously visted, update creature.tiles
             i, j = mf.find_tile(creature, tileSize, height, width)
+            unique = True
+            for t in creature.tiles:
+                if i == t[0] and j == t[1]:
+                    unique = False
+                    break
+            if unique:
+                creature.tiles.append((i,j))
 
             #Update tilemap to reflect what creatures are on each tiles - tigers trump deer
             if creature.ctype == "tiger" and tilemapMaster != wood: #tigers are invisible in the forest
@@ -201,6 +208,7 @@ while not done:
         if epochCounter >= 2000:
             #Dump current best tiger list 
             for i,t in enumerate(c.bestTigerList):
+                print "New tiger %s added to bestTigers.txt! Fitness = %d." % (t[1].rstrip(), t[2])
                 f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
             c.bestTigerList = []
             epochCounter = 0
