@@ -21,6 +21,7 @@ from time import time
 
 #Open the output file
 f = open('bestTigers.txt', 'w')
+#f = open('bestDeer.txt', 'w')
 f.write("epoch,name,fitness,DNA\n")
 
 def quit_game():
@@ -157,7 +158,7 @@ while not done:
         for creature in cList:
             if not displayRect.colliderect(creature.rect):
                 # print "***********************              %s went off the map!" % (creature.name.rstrip())
-                creature.die()
+                creature.die(deathByWall = True)
 
         #Update display
         #update background to cover up dead (unupdated) sprites
@@ -207,10 +208,22 @@ while not done:
         epochCounter += 1
         if epochCounter >= 2000:
             #Dump current best tiger list 
+            newTigerCount = 0
             for i,t in enumerate(c.bestTigerList):
                 print "New tiger %s added to bestTigers.txt! Fitness = %d." % (t[1].rstrip(), t[2])
                 f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
+                newTigerCount += 1
+            ga.epochTigers = newTigerCount
+
+            newDeerCount = 0
+            for i,t in enumerate(c.bestTigerList):
+                # print "New deer %s added to bestDeer.txt! Fitness = %d." % (t[1].rstrip(), t[2])
+                # f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
+                newDeerCount += 1
+            ga.epochDeers = newDeerCount
+
             c.bestTigerList = []
+            c.bestDeerList = []
             epochCounter = 0
             epochValue += 1
             epochTime = time()

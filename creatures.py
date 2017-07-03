@@ -20,6 +20,7 @@ deerList = pygame.sprite.Group()
 
 deerSpeed = 0
 bestTigerList = []
+bestDeerList = []
 epoch = 1
 
 def load_png(name):
@@ -143,20 +144,22 @@ class Creature(pygame.sprite.Sprite):
         if self.ctype == 'tiger':
             self.killCount += 1
 
-    def die(self):
+    def die(self, deathByWall = False):
         # print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
         #     self.name.rstrip())
         if self.ctype == 'tiger':
-            fitness = self.killCount * 10 + len(self.tiles) * 3
-            ga.pool(fitness, self.DNA, self.ctype)
-            for t in ga.tGenepool: #record best performing tigers
-                if t[1] == self.DNA:
-                    bestTigerList.append([epoch, self.name, fitness, self.DNA])
-                    continue
+            if not deathByWall:
+                fitness = self.killCount * 10 + len(self.tiles) * 3
+                ga.pool(fitness, self.DNA, self.ctype)
+                for t in ga.tGenepool: #record best performing tigers
+                    if t[1] == self.DNA:
+                        bestTigerList.append([epoch, self.name, fitness, self.DNA])
+                        continue
             tigerList.remove(self)
         if self.ctype == 'deer':
-            fitness = self.age + 5.0 * epoch
-            ga.pool(fitness, self.DNA, self.ctype)
+            if not deathByWall:
+                fitness = self.age + 5.0 * epoch
+                ga.pool(fitness, self.DNA, self.ctype)
             # print 'References to mind:', getrefcount(self.mind)
             # print 'References to self:', getrefcount(self)
             deerList.remove(self)
@@ -180,12 +183,12 @@ def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1
 
             #Check the spawn against tiger positions to ensure they do not spawn too closely
             for tiger in tigerList:
-                if rangeX < (tiger.rect.centerx + 15) and rangeX > (tiger.rect.centerx - 15):
+                if pos[0] < (tiger.rect.centerx + 15) and pos[0] > (tiger.rect.centerx - 15):
                     acceptable = False #Too close to tiger
                     rangeX = (mapWidth-1)*tileSize
                     rangeY = (mapHeight-1)*tileSize
                     pos = [randint(0,rangeX), randint(0,rangeY)]
-        
+
     #if pos argument is passed but invalid, make it [0,0]
     if pos[0] < 0 and pos[1] < 0: 
         pos = [0,0]
