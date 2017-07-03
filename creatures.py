@@ -147,7 +147,7 @@ class Creature(pygame.sprite.Sprite):
         # print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
         #     self.name.rstrip())
         if self.ctype == 'tiger':
-            fitness = self.age
+            fitness = self.killCount * 10 + len(self.tiles) * 3
             ga.pool(fitness, self.DNA, self.ctype)
             for t in ga.tGenepool: #record best performing tigers
                 if t[1] == self.DNA:
