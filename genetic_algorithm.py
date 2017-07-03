@@ -8,6 +8,10 @@ Description:
 
 import random
 
+#How many creatures are added to the gene pool in the epoch
+epochTigers = 15
+epochDeers = 15
+
 #Lists of children waiting to be born
 tPregnancies = []
 dPregnancies = []
@@ -53,9 +57,15 @@ def DNA_crossover(f, m):
 		DNA2 = ''.join(DNA_c2)
 	return DNA1, DNA2
 
-def mutate(DNA):
+def mutate(DNA, ctype):
 	DNA = list(DNA)
-	numMutations = random.randint(100, 500)
+	#Function to increase to mutations when evolution slows
+	if ctype == 'tiger':
+		maxMutations = len(DNA) / (epochTigers + 1) 
+	else:
+		maxMutations = len(DNA) / (epochDeer + 1)
+
+	numMutations = random.randint(0, maxMutations)
 	for i in range(numMutations):
 		mutation = random.randint(0, (len(DNA) - 1))
 		if DNA[mutation] == '0':
@@ -75,16 +85,16 @@ def breed(ctype):
 	if ctype == "tiger":
 		#Take the DNA component from our random index values
 		DNA1, DNA2 = DNA_crossover(tGenepool[idx][1], tGenepool[idx2][1])
-		DNA1 = mutate(DNA1)
-		DNA2 = mutate(DNA2)
+		DNA1 = mutate(DNA1, ctype)
+		DNA2 = mutate(DNA2, ctype)
 		tPregnancies.append(DNA1)
 		tPregnancies.append(DNA2)
 
 	elif ctype == "deer":
 		#Take the DNA component from our random index values
 		DNA1, DNA2 = DNA_crossover(dGenepool[idx][1], dGenepool[idx2][1])
-		DNA1 = mutate(DNA1)
-		DNA2 = mutate(DNA2)
+		DNA1 = mutate(DNA1, ctype)
+		DNA2 = mutate(DNA2, ctype)
 		dPregnancies.append(DNA1)
 		dPregnancies.append(DNA2)
 

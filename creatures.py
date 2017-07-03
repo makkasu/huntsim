@@ -180,7 +180,7 @@ def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1
 
             #Check the spawn against tiger positions to ensure they do not spawn too closely
             for tiger in tigerList:
-                if rangeX < (tiger.rect.centerx + 15) and rangeX > (tiger.rect.centerx - 15):
+                if pos[0] < (tiger.rect.centerx + 15) and pos[0] > (tiger.rect.centerx - 15):
                     acceptable = False #Too close to tiger
                     rangeX = (mapWidth-1)*tileSize
                     rangeY = (mapHeight-1)*tileSize
