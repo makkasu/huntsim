@@ -18,12 +18,12 @@ green = (76, 173, 80)
 white = (255, 255, 255)
 
 #Constants for tiles
-wall = float32(-1.0)
-dirt = float32(-0.6)
-grass = float32(-0.2)
-wood = float32(0.2)
-tigerColour = float32(0.6)
-deerColour = float32(1.0)
+wall = float32(1.25)
+dirt = float32(0.375)
+grass = float32(0.5)
+wood = float32(0.625)
+tigerColour = float32(0.875)
+deerColour = float32(0.125)
 
 #Colour to tile conversion
 colours = {
