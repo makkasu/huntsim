@@ -20,7 +20,7 @@ class Mind():
 		self.firstGeneration = firstGeneration
 		self.numLayers = numLayers
 		self.DNA = DNA
-		self.outputNeurons = 5 #up, down, left, right, speed
+		self.outputNeurons = 4 #up, down, left, right (speed is gone for now)
 
 		if self.firstGeneration:
 			#Generate random DNA for the first generation

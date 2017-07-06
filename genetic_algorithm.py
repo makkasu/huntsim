@@ -65,6 +65,8 @@ def mutate(DNA, ctype):
 	else:
 		maxMutations = len(DNA) / (epochDeers + 1)
 
+	maxMutations = 0 # ******************************************* DELETE THIS LINE TO TURN MUTATIONS BACK ON!
+
 	numMutations = random.randint(0, maxMutations)
 	for i in range(numMutations):
 		mutation = random.randint(0, (len(DNA) - 1))

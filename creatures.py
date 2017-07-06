@@ -49,7 +49,7 @@ class Creature(pygame.sprite.Sprite):
         if ctype == 'tiger':
             self.image, self.rect = load_png('tiger.png')
             self.add(tigerList)
-            self.baseSpeed = 3
+            self.baseSpeed = 6
             self.topSpeed = 10
             self.energy = 300
             self.maxEnergy = 300
@@ -105,22 +105,22 @@ class Creature(pygame.sprite.Sprite):
 
         for action in actions: 
             #Speed up: action[0] = K_SPACE
-            if int(round(action[0])) == 1:
-                self.speed = self.topSpeed
-            else:
-                self.speed = self.baseSpeed
+            # if int(round(action[0])) == 1:
+            #     self.speed = self.topSpeed
+            # else:
+            #     self.speed = self.baseSpeed
 
             left, right, up, down, speed = False, False, False, False, False
             self.dx, self.dy = 0, 0 #Reset speed
 
             #Establish 'buttons pressed': 
-            if int(round(action[1])) == 1:
+            if int(round(action[0])) == 1:
                 up = True
-            if int(round(action[2])) == 1:
+            if int(round(action[1])) == 1:
                 left = True
-            if int(round(action[3])) == 1:
+            if int(round(action[2])) == 1:
                 down = True
-            if int(round(action[4])) == 1:
+            if int(round(action[3])) == 1:
                 right = True
 
             if up and not down:
