@@ -37,7 +37,8 @@ class Creature(pygame.sprite.Sprite):
     Generic creature class.
     Tigers hunt deer, deer eat grass. 
     All creatures lose energy over time and die it if hits zero.
-    Handles sprite initialisation and movement.
+    Handles sprite initialisation, vision and movement.
+    All creatures have a Mind object (see minds.py).
     """
 
     def __init__(self, position, ctype, DNA = ''):
@@ -140,6 +141,48 @@ class Creature(pygame.sprite.Sprite):
     def get_name(self):
         return choice(list(open('names.txt')))
 
+    def get_vision(self, i, j, tilemap, height, width, centreTile):
+        """
+        Takes tilemap and indicies, grabs 5x5 section of tilemap centred on (i,j),
+        sets vision equal to a list of length 5: 4 directions and the centre point.
+        The elements of the final vision list are the most common tile type in the 
+        quadrant they represent, with deer and walls trumping all other tiles.
+        """
+        #Set up 5x5 array, every element is -1 (which will indicate 'seeing off map')
+        chunk = [[wall for column in range(5)] for row in range(5)]
+
+        for idx in range(5):
+            for jdx in range(5):
+                #Find tilemap index we want to look at
+                tmidx = i - 2 + idx
+                tmjdx = j - 2 + jdx
+
+                #Skip changing vision list if index is out of tilemap bounds
+                if tmidx < 0 or tmjdx < 0 or tmidx > height - 1 or tmjdx < 0 or tmjdx > width - 1:
+                    continue
+
+                chunk[idx][jdx] = tilemap[i - 2 + idx][j - 2 + jdx]
+
+        # ********* THIS VISION CODE IS ONLY FOR TIGERS - WHEN DEER START MOVING, REWORK!
+        left = [chunk[1][0],chunk[2][0],chunk[3][0],chunk[1][1],chunk[2][1],chunk[3][1]]
+        right = [chunk[1][3],chunk[2][3],chunk[3][3],chunk[1][4],chunk[2][4],chunk[3][4]]
+        up = [chunk[0][1],chunk[0][2],chunk[0][3],chunk[1][1],chunk[1][2],chunk[1][3]]
+        down = [chunk[3][1],chunk[3][2],chunk[3][3],chunk[4][1],chunk[4][2],chunk[4][3]]
+
+        directions = [up,down,left,right]
+        visionTemp = []
+        for direction in directions:
+            if deerColour in direction:
+                visionTemp.append(deerColour)
+            elif wall in direction:
+                visionTemp.append(wall)
+            else:
+                visionTemp.append(max(set(direction), key=direction.count))
+        visionTemp.append(centreTile) #stop the tiger seeing itself in the centre square
+
+        self.vision = visionTemp
+        return
+
     def eat(self, eatEnergy):
         if self.energy < self.maxEnergy:
             self.energy += eatEnergy
@@ -162,8 +205,6 @@ class Creature(pygame.sprite.Sprite):
             if not deathByWall:
                 fitness = self.age + 5.0 * epoch
                 ga.pool(fitness, self.DNA, self.ctype)
-            # print 'References to mind:', getrefcount(self.mind)
-            # print 'References to self:', getrefcount(self)
             deerList.remove(self)
 
 def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1], DNA=''):

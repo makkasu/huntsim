@@ -97,11 +97,7 @@ while not done:
         #Update creature vision
         for creature in cList:
             i, j = mf.find_tile(creature, tileSize, height, width)
-            creature.vision = mf.get_vision(i, j, tilemap, height, width)
-            creature.vision[4] = tilemapMaster[i][j] #stop the tiger seeing itself in the centre square
-            # if creature.ctype == "tiger":
-            #     print '\n'
-            #     print('\n'.join([''.join(['{:4}'.format(item) for item in row]) for row in creature.vision]))
+            creature.get_vision(i, j, tilemap, height, width, tilemapMaster[i][j])
          
         #Handle input events
         for event in pygame.event.get():
@@ -111,6 +107,10 @@ while not done:
                 for creature in cList:
                     if creature.rect.collidepoint(event.pos):
                         print creature.name.rstrip(), creature.energy
+                        print "Vision: "
+                        print "     %s" % (tileNames[creature.vision[0]])
+                        print "  %s  %s  %s" % (tileNames[creature.vision[2]], tileNames[creature.vision[4]], tileNames[creature.vision[3]])
+                        print "     %s" % (tileNames[creature.vision[1]])
             if event.type == pygame.KEYDOWN:
                 if event.key == K_EQUALS:
                     c.deerSpeed += 1
