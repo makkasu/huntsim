@@ -112,7 +112,7 @@ class Creature(pygame.sprite.Sprite):
             #     self.speed = self.baseSpeed
 
             left, right, up, down, speed = False, False, False, False, False
-            self.dx, self.dy = 0, 0 #Reset speed
+            #self.dx, self.dy = 0, 0 #Reset speed
 
             #Establish 'buttons pressed': 
             if int(round(action[0])) == 1:
