@@ -33,6 +33,15 @@ colours = {
             deerColour : yellow,
             tigerColour : orange
           }
+
+tileNames = {
+	wall : '#',
+	dirt : 'd',
+	grass : 'g',
+	wood : 'w',
+	tigerColour : 'T',
+	deerColour : 'D'
+}
           
 #Game dimensions
 tileSize = 30 
@@ -46,3 +55,4 @@ maxSeeds = 50
 #Energy gained by eating deer or grass
 tigerEatEnergy = 50
 deerEatEnergy = 3
+
