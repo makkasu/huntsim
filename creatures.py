@@ -172,9 +172,9 @@ class Creature(pygame.sprite.Sprite):
         directions = [up,down,left,right]
         visionTemp = []
         for direction in directions:
-            if deerColour in direction && self.ctype == 'tiger':
+            if deerColour in direction and self.ctype == 'tiger':
                 visionTemp.append(deerColour)
-            elif tigerColour in direction && self.ctype == 'deer':
+            elif tigerColour in direction and self.ctype == 'deer':
                 visionTemp.append(tigerColour)
             else:
                 visionTemp.append(max(set(direction), key=direction.count)) #find most common tile 
