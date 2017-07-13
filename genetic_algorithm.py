@@ -58,23 +58,24 @@ def DNA_crossover(f, m):
 	return DNA1, DNA2
 
 def mutate(DNA, ctype):
-	DNA = list(DNA)
+	# DNA = list(DNA)
 	#Function to increase to mutations when evolution slows
-	if ctype == 'tiger':
-		maxMutations = len(DNA) / (epochTigers + 1) 
-	else:
-		maxMutations = len(DNA) / (epochDeers + 1)
+	# if ctype == 'tiger':
+	# 	maxMutations = len(DNA) / (epochTigers + 1) 
+	# else:
+	# 	maxMutations = len(DNA) / (epochDeers + 1)
 
-	maxMutations = 0 # ******************************************* DELETE THIS LINE TO TURN MUTATIONS BACK ON!
+	# maxMutations = 0 # ******************************************* DELETE THIS LINE TO TURN MUTATIONS BACK ON!
 
-	numMutations = random.randint(0, maxMutations)
-	for i in range(numMutations):
-		mutation = random.randint(0, (len(DNA) - 1))
-		if DNA[mutation] == '0':
-			DNA[mutation] = '1'
-		else:
-			DNA[mutation] = '0'
-	DNA = ''.join(DNA)
+	# numMutations = random.randint(0, maxMutations)
+	
+	# for i in range(numMutations):
+	# 	mutation = random.randint(0, (len(DNA) - 1))
+	# 	if DNA[mutation] == '0':
+	# 		DNA[mutation] = '1'
+	# 	else:
+	# 		DNA[mutation] = '0'
+	# DNA = ''.join(DNA)
 	return DNA
 
 def breed(ctype):
@@ -119,7 +120,7 @@ def pool(fitness, DNA, ctype):
 	if ctype == "deer" and len(dGenepool) < 15:
 		dGenepool.append([fitness, DNA])
 		dGenepool.sort(key=lambda x: x[0], reverse=True)
-		print 'THE LENGTH OF DNA:', len(DNA)
+		# print 'THE LENGTH OF DNA:', len(DNA)
 	elif ctype == "deer" and len(dGenepool) >= 15:
 		if fitness > dGenepool[14][0]:
 			dGenepool.append([fitness, DNA])
