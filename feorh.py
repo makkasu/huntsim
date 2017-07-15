@@ -225,7 +225,7 @@ while not done:
                 avBreedingFitness += t[2]
             avBreedingFitness = avBreedingFitness/len(c.bestTigerList) if len(c.bestTigerList) > 0 else 0.0
             wallDeathRate = 100 * sum(c.wallDeaths) / len(c.wallDeaths) if len(c.wallDeaths) > 0 else 0.0
-            c.wallDeaths = 0
+            c.wallDeaths = []
             f2.write("%d,%d,%f,%f,%f,%d\n" % (timeCounter,epochValue,avFitness,avBreedingFitness,wallDeathRate,killTotal))
         if epochCounter >= 2000: #End of epoch diagnostics
             #Dump current best tiger list 
