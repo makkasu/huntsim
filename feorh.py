@@ -15,9 +15,12 @@ from pygame.locals import *
 import mapfuncs as mf
 import creatures as c
 import genetic_algorithm as ga
+import minds as m
 from copy import deepcopy
 from settings import * #Various constants (such as the game dimensions) are stored here to reduce clutter
 from time import time
+
+from pympler.tracker import SummaryTracker
 
 #Open the output file
 f = open('bestTigers.txt', 'w')
@@ -52,6 +55,9 @@ display.blit(bgSurface,(0,0)) # blit the map to the screen
 #Initialise some deer at random locations
 deerPop = 10
 tigerPop = 5
+
+#Initialise neural network
+#m.create_mind()
 
 #Initialise tigers, then deers
 print "Here come the tigers!"
