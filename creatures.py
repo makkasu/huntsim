@@ -145,7 +145,7 @@ class Creature(pygame.sprite.Sprite):
         Takes tilemap and indicies, grabs 5x5 section of tilemap centred on (i,j),
         sets vision equal to a list of length 5: 4 directions and the centre point.
         The elements of the final vision list are the most common tile type in the 
-        quadrant they represent, with deer and walls trumping all other tiles.
+        quadrant they represent, with deer/tiger trumping all other tiles.
         """
         #Set up 5x5 array, every element is -1 (which will indicate 'seeing off map')
         chunk = [[wall for column in range(5)] for row in range(5)]
@@ -162,7 +162,7 @@ class Creature(pygame.sprite.Sprite):
 
                 chunk[idx][jdx] = tilemap[i - 2 + idx][j - 2 + jdx]
 
-        # ********* THIS VISION CODE IS ONLY FOR TIGERS - WHEN DEER START MOVING, REWORK!
+        #Collect 6 tiles in each direction
         left = [chunk[1][0],chunk[2][0],chunk[3][0],chunk[1][1],chunk[2][1],chunk[3][1]]
         right = [chunk[1][3],chunk[2][3],chunk[3][3],chunk[1][4],chunk[2][4],chunk[3][4]]
         up = [chunk[0][1],chunk[0][2],chunk[0][3],chunk[1][1],chunk[1][2],chunk[1][3]]
@@ -171,12 +171,12 @@ class Creature(pygame.sprite.Sprite):
         directions = [up,down,left,right]
         visionTemp = []
         for direction in directions:
-            if deerColour in direction:
+            if deerColour in direction and self.ctype == 'tiger':
                 visionTemp.append(deerColour)
-            elif wall in direction:
-                visionTemp.append(wall)
+            elif tigerColour in direction and self.ctype == 'deer':
+                visionTemp.append(tigerColour)
             else:
-                visionTemp.append(max(set(direction), key=direction.count))
+                visionTemp.append(max(set(direction), key=direction.count)) #find most common tile 
         visionTemp.append(centreTile) #stop the tiger seeing itself in the centre square
 
         self.vision = visionTemp
