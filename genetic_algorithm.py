@@ -4,6 +4,7 @@ Author: Oliver Giles & Max Potter
 Date: June 2017
 Description:
 	- Contains functions for DNA crossover and mutation
+	  as well as management of the gene pool.
 """
 
 import random
@@ -58,22 +59,22 @@ def DNA_crossover(f, m):
 	return DNA1, DNA2
 
 def mutate(DNA, ctype):
-	DNA = list(DNA)
-	#Function to increase to mutations when evolution slows
-	if ctype == 'tiger':
-		maxMutations = (len(DNA) / 12) / (5 + epochTigers) 
-	else:
-		maxMutations = (len(DNA) / 12) / (5 + epochDeers)
+	# DNA = list(DNA)
+	# #Function to increase to mutations when evolution slows
+	# if ctype == 'tiger':
+	# 	maxMutations = (len(DNA) / 12) / (5 + epochTigers) 
+	# else:
+	# 	maxMutations = (len(DNA) / 12) / (5 + epochDeers)
 
-	numMutations = random.randint(0, maxMutations)
+	# numMutations = random.randint(0, maxMutations)
 	
-	for i in range(numMutations):
-		mutation = random.randint(0, (len(DNA) - 1))
-		if DNA[mutation] == '0':
-			DNA[mutation] = '1'
-		else:
-			DNA[mutation] = '0'
-	DNA = ''.join(DNA)
+	# for i in range(numMutations):
+	# 	mutation = random.randint(0, (len(DNA) - 1))
+	# 	if DNA[mutation] == '0':
+	# 		DNA[mutation] = '1'
+	# 	else:
+	# 		DNA[mutation] = '0'
+	# DNA = ''.join(DNA)
 	return DNA
 
 def breed(ctype):

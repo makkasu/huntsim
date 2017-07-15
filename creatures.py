@@ -22,6 +22,7 @@ deerList = pygame.sprite.Group()
 deerSpeed = 0
 bestTigerList = []
 bestDeerList = []
+wallDeaths = []
 epoch = 1
 
 def load_png(name):
@@ -112,7 +113,7 @@ class Creature(pygame.sprite.Sprite):
             #     self.speed = self.baseSpeed
 
             left, right, up, down, speed = False, False, False, False, False
-            #self.dx, self.dy = 0, 0 #Reset speed
+            self.dx, self.dy = 0, 0 #Reset speed
 
             #Establish 'buttons pressed': 
             if int(round(action[0])) == 1:
@@ -194,18 +195,27 @@ class Creature(pygame.sprite.Sprite):
         #     self.name.rstrip())
         if self.ctype == 'tiger':
             if not deathByWall:
-                fitness = self.killCount * 10 + len(self.tiles) * 3
+                fitness = self.calc_fitness()
+                wallDeaths.append(0) #for tracking %walldeaths (see diagnostics, feorh.py)
+                #Determine if tiger is good enough to breed
+                fitness = self.calc_fitness()
                 ga.pool(fitness, self.DNA, self.ctype)
                 for t in ga.tGenepool: #record best performing tigers
                     if t[1] == self.DNA:
                         bestTigerList.append([epoch, self.name, fitness, self.DNA])
                         continue
+            else:
+                wallDeaths.append(1) #for tracking %walldeaths (see diagnostics, feorh.py)
             tigerList.remove(self)
         if self.ctype == 'deer':
             if not deathByWall:
-                fitness = self.age + 5.0 * epoch
+                fitness = self.calc_fitness()
                 ga.pool(fitness, self.DNA, self.ctype)
             deerList.remove(self)
+
+    def calc_fitness(self):
+        #Fitness function for tigers and deer
+        return self.killCount * 10 + len(self.tiles) * 3 if self.ctype == 'tiger' else self.age + 5.0 * epoch
 
 def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1], DNA=''):
     """

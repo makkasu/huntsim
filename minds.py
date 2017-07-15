@@ -100,11 +100,7 @@ class Mind():
 		impulse = np.float32(2*random.random() - 1)
 		tempList = []
 		tempList.append(impulse)
-		# vision = np.array([tempList])
 		vision.append(impulse)
-		# print vision
 		vision2 = np.array([vision]) #Flatten array
-		# print vision2
-		# print "\n\n"
 		self.actions = self.model.predict(vision2)
 		return self.actions

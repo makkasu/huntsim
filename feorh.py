@@ -6,7 +6,7 @@ Description:
     - Use pygame to create a simplistic model of a tiger hunting deer
     - Randomly generate a tile-based map 
     - Populate the map with tigers and deer
-    - Tigers and deer have neural network 'brains' with 65 neurons each
+    - Tigers and deer have neural network 'brains' that control their actions
 """
 
 import pygame
@@ -19,10 +19,11 @@ from copy import deepcopy
 from settings import * #Various constants (such as the game dimensions) are stored here to reduce clutter
 from time import time
 
-#Open the output file
+#Open the output files
 f = open('bestTigers.txt', 'w')
-#f = open('bestDeer.txt', 'w')
+f2 = open('fitnessAndDeath.txt', 'w')
 f.write("epoch,name,fitness,DNA\n")
+f2.write("time,epoch,average fitness,average fitness of breeders,%wall deaths,killTotal\n")
 
 def quit_game():
     f.close()
@@ -32,7 +33,6 @@ def quit_game():
 
 #Create tilemap list
 tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
-print tilemap
 tilemapMaster = deepcopy(tilemap) #edits to sub arrays in tilemap won't edit tilemapMaster
 
 #Initiate display
@@ -80,9 +80,10 @@ epochTime = time()
 done = False
 pause = False
 epochCounter = 0
+timeCounter = 0
+killTotal = 0
 while not done:
     clock.tick(fps) # limit fps
-
     if not pause:
         #Detect collisions between each tiger and all the deer on the map. If there is a collision, kill the deer.
         for tiger in c.tigerList:
@@ -90,6 +91,7 @@ while not done:
             for col in collision_list:
                 # print "%s was eaten by %s!" % (col.name.rstrip(), tiger.name.rstrip())
                 tiger.eat(tigerEatEnergy)
+                killTotal += 1
 
         #Gather all living sprites into one list
         cList = c.tigerList.sprites() + c.deerList.sprites()
@@ -205,9 +207,23 @@ while not done:
         oldDeerPoints = deerPoints
         oldTigerPoints = tigerPoints
 
-        #Update epoch if necessary
+        #Diagnostics
+        timeCounter += 1
         epochCounter += 1
-        if epochCounter >= 2000:
+        if epochCounter % 100 == 0:
+            # find average fitness and dump it + wall deaths
+            fitList = []
+            for t in c.tigerList.sprites():
+                fitList.append(t.calc_fitness())
+            avFitness = sum(fitList) / len(fitList)
+            avBreedingFitness = 0
+            for t in c.bestTigerList:
+                avBreedingFitness += t[2]
+            avBreedingFitness = avBreedingFitness/len(c.bestTigerList) if len(c.bestTigerList) > 0 else 0.0
+            wallDeathRate = 100 * sum(c.wallDeaths) / len(c.wallDeaths) if len(c.wallDeaths) > 0 else 0.0
+            c.wallDeaths = 0
+            f2.write("%d,%d,%f,%f,%f,%d\n" % (timeCounter,epochValue,avFitness,avBreedingFitness,wallDeathRate,killTotal))
+        if epochCounter >= 2000: #End of epoch diagnostics
             #Dump current best tiger list 
             newTigerCount = 0
             for i,t in enumerate(c.bestTigerList):
