@@ -88,8 +88,7 @@ class Creature(pygame.sprite.Sprite):
         #Create blank DNA and attach a Mind object to our creature
         self.DNA = DNA
         child = False if len(self.DNA) > 0 else True #children will have non-blank DNA strings
-        self.mind = m.Mind(firstGeneration = child, DNA = DNA)
-        self.DNA = self.mind.DNAbin
+        self.weights, self.DNA = m.get_weights(firstGeneration = child, DNA = DNA)
 
     def update(self):
         #Deplete energy and check if still alive!
@@ -103,7 +102,7 @@ class Creature(pygame.sprite.Sprite):
                 self.die()
 
         #Feed vision into neural network and retrieve button presses
-        actions = self.mind.think(self.vision)
+        actions = m.think(self.weights, self.vision)
 
         for action in actions: 
             #Speed up: action[0] = K_SPACE

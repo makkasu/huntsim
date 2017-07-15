@@ -65,9 +65,8 @@ def mutate(DNA, ctype):
 	# 	maxMutations = (len(DNA) / 12) / (5 + epochTigers) 
 	# else:
 	# 	maxMutations = (len(DNA) / 12) / (5 + epochDeers)
-
 	# numMutations = random.randint(0, maxMutations)
-	
+
 	# for i in range(numMutations):
 	# 	mutation = random.randint(0, (len(DNA) - 1))
 	# 	if DNA[mutation] == '0':
