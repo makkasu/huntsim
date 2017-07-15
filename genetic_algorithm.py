@@ -61,7 +61,8 @@ def mutate(DNA, ctype):
 	DNA = list(DNA)
 	#Function to increase to mutations when evolution slows
 	if ctype == 'tiger':
-		maxMutations = (len(DNA) / 12) / (5 + epochTigers) 
+		maxMutations = (len(DNA) / 12) / (5 + epochTigers)
+		print 'Max mutations:', maxMutations, '\nLength of DNA:', len(DNA) 
 	else:
 		maxMutations = (len(DNA) / 12) / (5 + epochDeers)
 
