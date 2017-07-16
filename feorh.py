@@ -221,9 +221,9 @@ while not done:
                 fitList.append(t.calc_fitness())
             avFitness = sum(fitList) / len(fitList)
             avBreedingFitness = 0
-            for t in c.bestTigerList:
-                avBreedingFitness += t[2]
-            avBreedingFitness = avBreedingFitness/len(c.bestTigerList) if len(c.bestTigerList) > 0 else 0.0
+            for t in ga.tGenepool:
+                avBreedingFitness += t[0]
+            avBreedingFitness = avBreedingFitness/len(ga.tGenepool) if len(ga.tGenepool) > 0 else 0.0
             wallDeathRate = 100 * sum(c.wallDeaths) / len(c.wallDeaths) if len(c.wallDeaths) > 0 else 0.0
             c.wallDeaths = []
             f2.write("%d,%d,%f,%f,%f,%d\n" % (timeCounter,epochValue,avFitness,avBreedingFitness,wallDeathRate,killTotal))
