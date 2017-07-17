@@ -21,13 +21,16 @@ from settings import * #Various constants (such as the game dimensions) are stor
 from time import time
 
 #Open the output file
-f = open('bestTigers.txt', 'w')
-f2 = open('fitnessAndDeath.txt', 'w')
-f.write("epoch,name,fitness,DNA\n")
-f2.write("time,epoch,average fitness,average fitness of breeders,%wall deaths,killTotal\n")
+if runDiagnostics:
+    f = open('bestTigers.txt', 'w')
+    f2 = open('fitnessAndDeath.txt', 'w')
+    f.write("epoch,name,fitness,DNA\n")
+    f2.write("time,epoch,average fitness,average fitness of breeders,%wall deaths,killTotal\n")
 
 def quit_game():
-    f.close()
+    if runDiagnostics:
+        f.close()
+        f2.close()
     pygame.quit()
     sys.exit()
     return
@@ -214,42 +217,43 @@ while not done:
         #Diagnostics
         timeCounter += 1
         epochCounter += 1
-        if epochCounter % 100 == 0:
-            # find average fitness and dump it + wall deaths
-            fitList = []
-            for t in c.tigerList.sprites():
-                fitList.append(t.calc_fitness())
-            avFitness = sum(fitList) / len(fitList)
-            avBreedingFitness = 0
-            for t in ga.tGenepool:
-                avBreedingFitness += t[0]
-            avBreedingFitness = avBreedingFitness/len(ga.tGenepool) if len(ga.tGenepool) > 0 else 0.0
-            wallDeathRate = 100 * sum(c.wallDeaths) / len(c.wallDeaths) if len(c.wallDeaths) > 0 else 0.0
-            c.wallDeaths = []
-            f2.write("%d,%d,%f,%f,%f,%d\n" % (timeCounter,epochValue,avFitness,avBreedingFitness,wallDeathRate,killTotal))
-        if epochCounter >= 2000: #End of epoch diagnostics
-            #Dump current best tiger list 
-            newTigerCount = 0
-            for i,t in enumerate(c.bestTigerList):
-                print "New tiger %s added to bestTigers.txt! Fitness = %d." % (t[1].rstrip(), t[2])
-                f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
-                newTigerCount += 1
-            ga.epochTigers = newTigerCount
+        if runDiagnostics:
+            if epochCounter % 100 == 0:
+                # find average fitness and dump it + wall deaths
+                fitList = []
+                for t in c.tigerList.sprites():
+                    fitList.append(t.calc_fitness())
+                avFitness = sum(fitList) / len(fitList)
+                avBreedingFitness = 0
+                for t in ga.tGenepool:
+                    avBreedingFitness += t[0]
+                avBreedingFitness = avBreedingFitness/len(ga.tGenepool) if len(ga.tGenepool) > 0 else 0.0
+                wallDeathRate = 100 * sum(c.wallDeaths) / len(c.wallDeaths) if len(c.wallDeaths) > 0 else 0.0
+                c.wallDeaths = []
+                f2.write("%d,%d,%f,%f,%f,%d\n" % (timeCounter,epochValue,avFitness,avBreedingFitness,wallDeathRate,killTotal))
+            if epochCounter >= 2000: #End of epoch diagnostics
+                #Dump current best tiger list 
+                newTigerCount = 0
+                for i,t in enumerate(c.bestTigerList):
+                    print "New tiger %s added to bestTigers.txt! Fitness = %d." % (t[1].rstrip(), t[2])
+                    f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
+                    newTigerCount += 1
+                ga.epochTigers = newTigerCount
 
-            newDeerCount = 0
-            for i,t in enumerate(c.bestTigerList):
-                # print "New deer %s added to bestDeer.txt! Fitness = %d." % (t[1].rstrip(), t[2])
-                # f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
-                newDeerCount += 1
-            ga.epochDeers = newDeerCount
+                newDeerCount = 0
+                for i,t in enumerate(c.bestTigerList):
+                    # print "New deer %s added to bestDeer.txt! Fitness = %d." % (t[1].rstrip(), t[2])
+                    # f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
+                    newDeerCount += 1
+                ga.epochDeers = newDeerCount
 
-            c.bestTigerList = []
-            c.bestDeerList = []
-            epochCounter = 0
-            epochValue += 1
-            epochTime = time()
-            c.epoch = epochValue
-            print ' *                            Epoch:', epochValue
+                c.bestTigerList = []
+                c.bestDeerList = []
+                epochCounter = 0
+                epochValue += 1
+                epochTime = time()
+                c.epoch = epochValue
+                print ' *                            Epoch:', epochValue
 
     else:
         pygame.event.pump()

@@ -7,6 +7,9 @@ Description:
 """
 from numpy import float32
 
+#Flags
+runDiagnostics = True
+
 #Starting framerate
 fps = 10
 
