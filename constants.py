@@ -6,6 +6,7 @@ Description:
     - Stores the various parameters of the game
 """
 from numpy import float32
+import itertools
 
 #Meta properties
 MAX_EPOCH = 100
@@ -52,6 +53,10 @@ GRASS = float32(0.5)
 WOOD = float32(0.625)
 TIGERCOLOUR = float32(0.875)
 DEERCOLOUR = float32(0.125)
+
+#State machine bits
+tileTypes = [WALL, DIRT, GRASS, WOOD, TIGERCOLOUR, DEERCOLOUR]
+possibleStates = list(itertools.product(tileTypes, repeat=5))
 
 #Colour to tile conversion
 colours = {

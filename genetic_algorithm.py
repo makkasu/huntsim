@@ -50,14 +50,10 @@ def DNA_crossover(f, m):
 	if len(spliceLocs) % 2:
 		DNA_c1.append(m[readLoc:])
 		DNA_c2.append(f[readLoc:])
-		DNA1 = ''.join(DNA_c1)
-		DNA2 = ''.join(DNA_c2)
 	else:
 		DNA_c1.append(f[readLoc:])
 		DNA_c2.append(m[readLoc:])
-		DNA1 = ''.join(DNA_c1)
-		DNA2 = ''.join(DNA_c2)
-	return DNA1, DNA2
+	return DNA_c1, DNA_c2
 
 def mutate(DNA, ctype):
 	DNA = list(DNA)
@@ -70,11 +66,7 @@ def mutate(DNA, ctype):
 
 	for i in range(numMutations):
 		mutation = random.randint(0, (len(DNA) - 1))
-		if DNA[mutation] == '0':
-			DNA[mutation] = '1'
-		else:
-			DNA[mutation] = '0'
-	DNA = ''.join(DNA)
+		DNA[mutation] == random.choice(const.possibleStates)
 	return DNA
 
 def breed(ctype):
@@ -119,7 +111,6 @@ def pool(fitness, DNA, ctype, idNum):
 	if ctype == "deer" and len(dGenepool) < 15:
 		dGenepool.append([fitness, DNA])
 		dGenepool.sort(key=lambda x: x[0], reverse=True)
-		# print 'THE LENGTH OF DNA:', len(DNA)
 	elif ctype == "deer" and len(dGenepool) >= 15:
 		if fitness > dGenepool[14][0]:
 			dGenepool.append([fitness, DNA])

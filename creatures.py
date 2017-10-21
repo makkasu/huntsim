@@ -14,12 +14,13 @@ from time import time
 import genetic_algorithm as ga
 from sys import getrefcount
 import constants as const
+import itertools
 
 #Lists of objects
 tigerList = pygame.sprite.Group()
 deerList = pygame.sprite.Group()
 
-deerSpeed = 0
+deerSpeed = 5
 fitnesses = []
 wallDeaths = []
 newBreeders = []
@@ -28,6 +29,11 @@ idNumber = 0
 wall = const.WALL
 deerColour = const.DEERCOLOUR
 tigerColour = const.TIGERCOLOUR
+
+#New state machine bits
+possibleActions = list(itertools.product([0, 1], repeat=4))
+tileTypes = const.tileTypes
+possibleStates = const.possibleStates
 
 def load_png(name):
     image = pygame.image.load(name)
@@ -92,9 +98,11 @@ class Creature(pygame.sprite.Sprite):
         self.vision = [wall,wall,wall,wall,wall]
 
         #Create blank DNA and attach a Mind object to our creature
-        self.DNA = DNA
-        child = False if len(self.DNA) > 0 else True #children will have non-blank DNA strings
-        self.weights, self.DNA = m.get_weights(firstGeneration = child, DNA = DNA)
+        if DNA == '':
+            self.DNA = [choice(possibleActions) for i in range(len(possibleStates))]
+        else:
+            self.DNA = DNA
+        print len(self.DNA)
 
     def update(self):
         #Deplete energy and check if still alive!
@@ -108,7 +116,11 @@ class Creature(pygame.sprite.Sprite):
                 self.die()
 
         #Feed vision into neural network and retrieve button presses
-        actions = m.think(self.weights, self.vision)
+        #actions = m.think(self.weights, self.vision)
+        try:
+            actions = [self.DNA[possibleStates.index(tuple(self.vision))]]
+        except:
+            print possibleStates.index(tuple(self.vision))
 
         for action in actions: 
             #Speed up: action[0] = K_SPACE
