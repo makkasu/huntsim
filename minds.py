@@ -12,11 +12,12 @@ import random
 import numpy as np
 import math
 from bitstring import BitArray
+import constants as const
 
-inputCount = 6
-neuronsPerLayer = 15
-numHiddenLayers = 1
-outputNeurons = 4
+inputCount = const.INPUT_COUNT
+neuronsPerLayer = const.NEURONS_PER_LAYER
+numHiddenLayers = const.NUM_HIDDEN_LAYERS
+outputNeurons = const.OUTPUT_NEURONS
 
 model = Sequential()
 model.add(Dense(neuronsPerLayer, input_shape = (inputCount,), activation='relu'))

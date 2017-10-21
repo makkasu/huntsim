@@ -1,190 +1,242 @@
 """
 Name: feorh.py 
-Authors: Oliver Giles & Max Potter
-Date: June 2017
+Author: Oliver Giles & Max Potter
+Date: July 2017
 Description:
-    - Use pygame to create a simplistic model of a tiger hunting deer
-    - Randomly generate a tile-based map 
-    - Populate the map with tigers and deer
-    - Tigers and deer have neural network 'brains' with 65 neurons each
+    - Contains class definitions for game
 """
 
 import pygame
 import sys
 from pygame.locals import *
+from copy import deepcopy
+import constants as const
 import mapfuncs as mf
 import creatures as c
-import genetic_algorithm as ga
 import minds as m
-from copy import deepcopy
-from settings import * #Various constants (such as the game dimensions) are stored here to reduce clutter
-from time import time
+import genetic_algorithm as ga
 
-from pympler.tracker import SummaryTracker
+class Feorh():
+    """
+    Feorh - Class describing a simple hunting game, played by AI.
+    """
+    epoch = 1
+    width = const.WIDTH
+    height = const.HEIGHT
+    tileSize = const.TILESIZE
 
-#Open the output file
-f = open('bestTigers.txt', 'w')
-#f = open('bestDeer.txt', 'w')
-f.write("epoch,name,fitness,DNA\n")
+    def __init__(self):
+        self.start_diagnostics()
 
-def quit_game():
-    f.close()
-    pygame.quit()
-    sys.exit()
-    return
+        #Initialise display
+        self.display, self.displayRect = start_display('Feorh')
 
-#Create tilemap list
-tilemap = mf.create_map(width, height, minSeeds, maxSeeds)
-print tilemap
-tilemapMaster = deepcopy(tilemap) #edits to sub arrays in tilemap won't edit tilemapMaster
+        #Create & show map
+        self.tilemap = mf.create_map(self.width, self.height, const.MINSEEDS, 
+                                     const.MAXSEEDS)
+        self.tilemapMaster = deepcopy(self.tilemap) #edits to sub arrays in tilemap 
+                                                    #won't edit tilemapMaster                    
+        self.make_background()
 
-#Initiate display
-pygame.init()
-display = pygame.display.set_mode((width * tileSize, height * tileSize))
-displayRect = display.get_rect()
-pygame.display.set_caption('Feorh')
+        #Spawn creatures
+        for i in range(const.TIGERPOP):
+            self.populate('tiger', const.TIGERPOP)
+        for i in range(const.DEERPOP):
+            self.populate('deer', const.DEERPOP)
 
-#Draw the map
-bgSurface = pygame.Surface(display.get_size())
-for row in range(height):
-    for column in range(width):
-        bgRect = pygame.draw.rect(bgSurface, colours[tilemap[row][column]], (column*tileSize, row*tileSize, tileSize, tileSize))
-bgSurface = bgSurface.convert()
-display.blit(bgSurface,(0,0)) # blit the map to the screen
+        #Set up housekeeping lists and counters
+        self.oldDeerPoints = [] #used for tracking past locations of deer
+        self.oldTigerPoints = []
+        self.pause = False
+        self.epochCounter = 0
+        self.timeCounter = 0
+        self.killTotal = 0
 
-#Initialise some deer at random locations
-deerPop = 10
-tigerPop = 5
+        self.fps = const.START_FPS
+        self.clock = pygame.time.Clock()
+        return
 
-#Initialise neural network
-#m.create_mind()
+    def update(self): 
+        """
+        Limit fps, handle user input and, if not paused, run game logic.
+        """
+        self.clock.tick(self.fps)
+        self.handle_user_input()
+        if not self.pause:
+            self.run_game_logic()
+        else:
+            self.run_pause_logic()
+        return
 
-#Initialise tigers, then deers
-print "Here come the tigers!"
-for i in range(tigerPop):
-    tempCreature = c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize)
-    print tempCreature[0].name
+    def run_game_logic(self):
+        """
+        The structure of the main game loop.
+        Everything here is ran once per update when not paused.
+        """        
+        #************ UPDATE CREATURES
+        #Detect collisions between tigers and deer
+        self.kill_detection()
 
-print "Meet the deer!"
-for i in range(deerPop):
-    tempCreature = c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
-    print tempCreature[0].name
-print "\n"
+        #Gather all living sprites into one list
+        self.cList = c.tigerList.sprites() + c.deerList.sprites()
 
-#Initialise blank lists for previous tiger and deer positions on the map
-oldDeerPoints = []
-oldTigerPoints = []
+        #Update tilemap with position of all creatures
+        self.update_tilemap()
 
-#Initialise clock
-clock = pygame.time.Clock()
+        #Update creatures: update & supply vision, get and enact actions
+        for creature in self.cList:
+            i, j = mf.find_tile(creature, self.tileSize, self.height, self.width)
+            creature.get_vision(i, j, self.tilemap, self.height, self.width, 
+                                self.tilemapMaster[i][j])
+            #Kill any creature that walks off the map.
+            if not self.displayRect.colliderect(creature.rect):
+                creature.die(deathByWall = True)
+        c.deerList.update()
+        c.tigerList.update()
 
-#Initiliase epoch count
-epochValue = 1
-epochTime = time()
+        #Check if there are enough tigers and deer - if not, create children
+        self.populate('tiger', const.TIGERPOP, len(c.tigerList), 
+                      len(ga.tGenepool), len(ga.tPregnancies))
+        self.populate('deer', const.DEERPOP, len(c.deerList), 
+                      len(ga.dGenepool), len(ga.dPregnancies))
 
-#Main game loop
-done = False
-pause = False
-epochCounter = 0
-while not done:
-    clock.tick(fps) # limit fps
+        #************ END OF STEP: visualisation and diagnostics
+        update_display(self.display, self.cList, [c.deerList, c.tigerList], 
+                       self.bgSurface)
 
-    if not pause:
-        #Detect collisions between each tiger and all the deer on the map. If there is a collision, kill the deer.
+        self.diagnostics()
+        return
+
+    def run_pause_logic(self):
+        pygame.event.pump()
+        return
+
+    def running(self):
+        """
+        Describes the conditions under which the game will keep running.
+        Returns the truth value of these conditions.
+        """
+        return True
+
+    def quit_game():
+        if const.RUN_DIAGNOSTICS:
+            for f in self.openFiles:
+                f.close()
+        pygame.quit()
+        sys.exit()
+        return
+
+    def start_diagnostics(self):
+        """
+        Open output files. Toggleable with RUN_DIAGNOSTICS flag in constants.
+        """
+        if const.RUN_DIAGNOSTICS:        
+            self.f = open('bestTigers.txt', 'w')
+            self.f2 = open('fitnessAndDeath.txt', 'w')
+            self.f.write("epoch,fitness,DNA,ID\n")
+            self.f2.write("time,epoch,live average fitness,"
+                     "average fitness of breeders,%wall deaths,killTotal\n")
+            self.openFiles = [self.f,self.f2]
+        return
+
+    def make_background(self):
+        """
+        Generate a pygame rect to represent the map, draw it to a surface.
+        Blit that surface to the display.
+        """
+        self.bgSurface = pygame.Surface(self.display.get_size())
+        for row in range(self.height):
+            for column in range(self.width):
+                self.bgRect = pygame.draw.rect(self.bgSurface, 
+                                               const.colours[self.tilemap[row][column]], 
+                                               (column*self.tileSize, 
+                                                row*self.tileSize, 
+                                                self.tileSize, 
+                                                self.tileSize))
+        self.bgSurface = self.bgSurface.convert()
+        self.display.blit(self.bgSurface,(0,0)) # blit the map to the screen
+        return
+
+    def populate(self, ctype, popSize, cListSize = 0, poolSize = 0, 
+                 pregListSize = 0):
+        """
+        Check if there are enough tigers and deers. If not, create children.
+        """
+        #Do we need to spawn a creature?
+        if cListSize < popSize: 
+            if poolSize < const.GENE_POOL_SIZE:
+                #If genepool is small, spawn creature with randomised DNA
+                c.spawn_creature(ctype, mapHeight=self.height, mapWidth=self.width, 
+                                 tileSize=self.tileSize)
+            else:
+                #If not, make sure DNA is ready (a 'pregnancy')
+                if pregListSize == 0:
+                    #Make DNA through breeding creatures in genepool
+                    ga.breed(ctype)
+                DNA = ga.get_DNA(ctype)
+                c.spawn_creature(ctype, mapHeight=self.height, mapWidth=self.width, 
+                                 tileSize=self.tileSize, DNA=DNA)
+        return
+
+    def handle_user_input(self):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                self.quit_game()
+            elif event.type == pygame.MOUSEBUTTONDOWN: 
+                #print creature's vision on mouse click
+                for creature in self.cList:
+                    if creature.rect.collidepoint(event.pos):
+                        creature.print_vision()
+            elif event.type == pygame.KEYDOWN:
+                #Increase/decrease speed of newly spawning deer on =/-
+                if event.key == K_EQUALS:
+                    c.deerSpeed += 1
+                    print "Deer speed increased to %d" % c.deerSpeed
+                elif event.key == K_MINUS:
+                    c.deerSpeed = c.deerSpeed - 1 if c.deerSpeed > 0 else 0
+                    print "Deer speed decreased to %d" % c.deerSpeed
+                #Raise/lower fps by 10 (never goes below 1) on ]/[
+                elif event.key == K_LEFTBRACKET:
+                    self.fps = self.fps - 10 if self.fps >= 0 else 1
+                    self.fps = self.fps if self.fps >= 1 else 1
+                    print " * FPS = %d" % self.fps
+                elif event.key == K_RIGHTBRACKET:
+                    self.fps += 10
+                    print " * FPS = %d" % self.fps
+                #Pause game on space
+                elif event.key == K_SPACE:
+                    if not self.pause:
+                        print " * PAUSED * "
+                        self.pause = True
+                    else:
+                        print " * RESUMED * "
+                        self.pause = False
+        return
+
+    def kill_detection(self):
+        """
+        Detect collisions between each tiger and all the deer on the map. 
+        If there is a collision, kill the deer and feed the tiger. Record kill.
+        """
         for tiger in c.tigerList:
             collision_list = pygame.sprite.spritecollide(tiger, c.deerList, True)
             for col in collision_list:
                 # print "%s was eaten by %s!" % (col.name.rstrip(), tiger.name.rstrip())
-                tiger.eat(tigerEatEnergy)
+                tiger.eat(const.TIGER_EAT_ENERGY)
+                self.killTotal += 1
+        return
 
-        #Gather all living sprites into one list
-        cList = c.tigerList.sprites() + c.deerList.sprites()
-
-        #Update creature vision
-        for creature in cList:
-            i, j = mf.find_tile(creature, tileSize, height, width)
-            creature.get_vision(i, j, tilemap, height, width, tilemapMaster[i][j])
-         
-        #Handle input events
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                quit_game()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                for creature in cList:
-                    if creature.rect.collidepoint(event.pos):
-                        print creature.name.rstrip(), creature.energy
-                        print "Vision: "
-                        print "     %s" % (tileNames[creature.vision[0]])
-                        print "  %s  %s  %s" % (tileNames[creature.vision[2]], tileNames[creature.vision[4]], tileNames[creature.vision[3]])
-                        print "     %s" % (tileNames[creature.vision[1]])
-            if event.type == pygame.KEYDOWN:
-                if event.key == K_EQUALS:
-                    c.deerSpeed += 1
-                    print "Deer speed increased to %d" % c.deerSpeed
-                if event.key == K_MINUS:
-                    c.deerSpeed = c.deerSpeed - 1 if c.deerSpeed > 0 else 0
-                    print "Deer speed decreased to %d" % c.deerSpeed
-                if event.key == K_LEFTBRACKET:
-                    fps = fps - 10 if fps >= 0 else 1
-                    fps = fps if fps >= 1 else 1
-                    print " * FPS = %d" % fps
-                if event.key == K_RIGHTBRACKET:
-                    fps += 10
-                    print " * FPS = %d" % fps
-                if event.key == K_SPACE:
-                    print " * PAUSED * "
-                    pause = True
-
-        #Check if there are enough tigers and deers. If not, create children
-        if len(c.tigerList) < tigerPop:
-            if len(ga.tGenepool) < 15:
-                c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize)
-                pass
-            else:
-                if len(ga.tPregnancies) > 0:
-                    DNA = ga.get_DNA("tiger")
-                    c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
-                else:
-                    ga.breed("tiger")
-                    DNA = ga.get_DNA("tiger")
-                    c.spawn_creature("tiger", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
-
-        if len(c.deerList) < deerPop:
-            if len(ga.dGenepool) < 15:
-                c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize)
-            else:
-                if len(ga.dPregnancies) > 0:
-                    DNA = ga.get_DNA("deer")
-                    c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
-                else:
-                    ga.breed("deer")
-                    DNA = ga.get_DNA("deer")
-                    c.spawn_creature("deer", mapHeight=height, mapWidth=width, tileSize=tileSize, DNA=DNA)
-
-        #Kill any creature that walks off the map
-        for creature in cList:
-            if not displayRect.colliderect(creature.rect):
-                # print "***********************              %s went off the map!" % (creature.name.rstrip())
-                creature.die(deathByWall = True)
-
-        #Update display
-        #update background to cover up dead (unupdated) sprites
-        display.blit(bgSurface,(0,0))
-        for creature in cList:
-            display.blit(bgSurface, creature.rect, creature.rect)  
-        c.deerList.update()
-        c.tigerList.update()
-        # - draw all living sprites to the screen
-        c.deerList.draw(display)
-        c.tigerList.draw(display)
-        pygame.display.update()
-
-        #Update tilemap with positions of all creatures
+    def update_tilemap(self):
+        """
+        Store the position of all creatures on the tilemap. tilemapMaster 
+        records the original tile in order to revert once a creature moves.
+        """
         tigerPoints = []
         deerPoints = []
-        for creature in cList:
-            #what tile is the creature on? If it stands on a tile not previously visted, update creature.tiles
-            i, j = mf.find_tile(creature, tileSize, height, width)
+        for creature in self.cList:
+            #what tile is the creature on? If it stands on a tile not previously
+            #visted, update creature.tiles.
+            i, j = mf.find_tile(creature, self.tileSize, self.height, self.width)
             unique = True
             for t in creature.tiles:
                 if i == t[0] and j == t[1]:
@@ -193,57 +245,102 @@ while not done:
             if unique:
                 creature.tiles.append((i,j))
 
-            #Update tilemap to reflect what creatures are on each tiles - tigers trump deer
-            if creature.ctype == "tiger" and tilemapMaster[i][j] != wood: #tigers are invisible in the forest
+            #Update tilemap to reflect what creatures are on each tiles
+            # * tigers trump deer and are invisible in forests.
+            isTiger = creature.ctype == "tiger"
+            isNotInWood = self.tilemapMaster[i][j] != const.WOOD
+            isDeer = creature.ctype == "deer"
+            tigerNotOnTile = self.tilemap[i][j] != const.TIGERCOLOUR
+            if isTiger and isNotInWood: 
                 tigerPoints.append([i,j])
-                tilemap[i][j] = tigerColour
-            elif creature.ctype == "deer" and tilemap[i][j] != tigerColour: 
-                tilemap[i][j] = deerColour
+                self.tilemap[i][j] = const.TIGERCOLOUR
+            elif isDeer and tigerNotOnTile: 
+                self.tilemap[i][j] = const.DEERCOLOUR
                 deerPoints.append([i,j])
-                if tilemapMaster[i][j] == grass: #don't forget to feed the deer!
-                    creature.eat(deerEatEnergy)
+                if self.tilemapMaster[i][j] == const.GRASS: 
+                    #don't forget to feed the deer!
+                    creature.eat(const.DEER_EAT_ENERGY)
 
-        #Gather list of empty tiles by comparing old and new lists, then replace the tiles with their original types.
-        emptyTiles = [point for point in oldTigerPoints if point not in tigerPoints]
-        emptyTiles.extend([point for point in oldDeerPoints if point not in deerPoints])
+        #Gather list of empty tiles by comparing old and new lists, then replace
+        #the tiles with their original types.
+        emptyTiles = [point for point in self.oldTigerPoints \
+                      if point not in tigerPoints]
+        emptyTiles.extend([point for point in self.oldDeerPoints \
+                           if point not in deerPoints])
         for tile in emptyTiles:
-            tilemap[tile[0]][tile[1]] = tilemapMaster[tile[0]][tile[1]]
-        oldDeerPoints = deerPoints
-        oldTigerPoints = tigerPoints
+            self.tilemap[tile[0]][tile[1]] = self.tilemapMaster[tile[0]][tile[1]]
+        self.oldDeerPoints = deerPoints
+        self.oldTigerPoints = tigerPoints
+        return
 
-        #Update epoch if necessary
-        epochCounter += 1
-        if epochCounter >= 2000:
-            #Dump current best tiger list 
-            newTigerCount = 0
-            for i,t in enumerate(c.bestTigerList):
-                print "New tiger %s added to bestTigers.txt! Fitness = %d." % (t[1].rstrip(), t[2])
-                f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
-                newTigerCount += 1
-            ga.epochTigers = newTigerCount
+    def diagnostics(self):
+        """
+        Collect and dump information about average fitness, rate of wall deaths
+        and total kills.
+        """
+        self.timeCounter += 1
+        self.epochCounter += 1
+        if const.RUN_DIAGNOSTICS:
+            if self.epochCounter % 100 == 0:
+                #Calculate rolling average fitness values from last 50 deaths
+                fitnessesLength = len(c.fitnesses)
+                fitnessesExist = fitnessesLength > 0
+                liveFitness = 100 * sum(c.fitnesses) / fitnessesLength if fitnessesExist else 0.0
+                if fitnessesLength > 50:
+                    del c.fitnesses[:fitnessesLength - 50]
 
-            newDeerCount = 0
-            for i,t in enumerate(c.bestTigerList):
-                # print "New deer %s added to bestDeer.txt! Fitness = %d." % (t[1].rstrip(), t[2])
-                # f.write(str(t[0])+','+t[1].rstrip()+','+str(t[2])+','+t[3][0:100]+'\n')
-                newDeerCount += 1
-            ga.epochDeers = newDeerCount
+                #Record fitness of breeding pool
+                avBreedingFitness = 0
+                for t in ga.tGenepool:
+                    avBreedingFitness += t[0]
+                breedersExist = len(ga.tGenepool) > 0
+                avBreedingFitness = avBreedingFitness/len(ga.tGenepool) if breedersExist else 0.0
+                
+                #Calculate rolling average wall death rate as above                
+                wallDeathLength = len(c.wallDeaths)
+                wallDeathsExist = wallDeathLength > 0
+                wallDeathRate = 100 * sum(c.wallDeaths) / wallDeathLength if wallDeathsExist else 0.0
+                if wallDeathLength > 50:
+                    del c.wallDeaths[:wallDeathLength - 50]
+                
+                self.f2.write("%d,%d,%f,%f,%f,%d\n" % (self.timeCounter,
+                                                       self.epoch,
+                                                       liveFitness,
+                                                       avBreedingFitness,
+                                                       wallDeathRate,
+                                                       self.killTotal))
+            if self.epochCounter >= 2000: #End of epoch diagnostics
+                #Dump current best tiger list 
+                newTigerCount = 0
+                for t in c.newBreeders:
+                    print "New tiger added to bestTigers.txt! Fitness = %d." % t[1]
+                    self.f.write("%d,%d,%d,%s\n" % (self.epoch, t[0], t[1], t[2]))
+                    newTigerCount += 1
+                ga.epochTigers = newTigerCount
+                c.newBreeders = []
+                
+                self.epochCounter = 0
+                self.epoch += 1
+                c.epoch = self.epoch
+                print ' *                            Epoch:', self.epoch    
+        return
 
-            c.bestTigerList = []
-            c.bestDeerList = []
-            epochCounter = 0
-            epochValue += 1
-            epochTime = time()
-            c.epoch = epochValue
-            print ' *                            Epoch:', epochValue
+def start_display(title, w = const.WIDTH, h = const.HEIGHT, 
+                  tileSize = const.TILESIZE):
+    """
+    Initialise pygame, open and title a window.
+    """
+    pygame.init()
+    display = pygame.display.set_mode((w * tileSize, h * tileSize))
+    drect = display.get_rect()
+    pygame.display.set_caption(title)
+    return display, drect
 
-    else:
-        pygame.event.pump()
-
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                quit_game()
-            if event.type == pygame.KEYDOWN:
-                if event.key == K_SPACE:
-                    print " * RESUMED * "
-                    pause = False
+def update_display(display, spriteList, groupsList, background):
+    display.blit(background,(0,0))
+    for sprite in spriteList:
+        display.blit(background, sprite.rect, sprite.rect) 
+    for group in groupsList:
+        group.draw(display)
+    pygame.display.update()
+    return

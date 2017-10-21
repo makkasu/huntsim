@@ -3,7 +3,7 @@ Name: creatures.py
 Author: Oliver Giles & Max Potter
 Date: June 2017
 Description:
-	- Contains class definitions for the animals of the game
+    - Contains class definitions for the animals of the game
 """
 
 import pygame
@@ -13,24 +13,29 @@ import minds as m
 from time import time
 import genetic_algorithm as ga
 from sys import getrefcount
-from settings import *
+import constants as const
 
 #Lists of objects
 tigerList = pygame.sprite.Group()
 deerList = pygame.sprite.Group()
 
 deerSpeed = 0
-bestTigerList = []
-bestDeerList = []
+fitnesses = []
+wallDeaths = []
+newBreeders = []
 epoch = 1
+idNumber = 0
+wall = const.WALL
+deerColour = const.DEERCOLOUR
+tigerColour = const.TIGERCOLOUR
 
 def load_png(name):
-	image = pygame.image.load(name)
-	if image.get_alpha is None:
-		image = image.convert()
-	else:
-		image = image.convert_alpha()
-	return image, image.get_rect()
+    image = pygame.image.load(name)
+    if image.get_alpha is None:
+        image = image.convert()
+    else:
+        image = image.convert_alpha()
+    return image, image.get_rect()
 
 class Creature(pygame.sprite.Sprite):
     """
@@ -58,6 +63,7 @@ class Creature(pygame.sprite.Sprite):
             self.birthsecond = time()
             self.age = 0.0
             self.killCount = 0
+            self.id = get_id()
         elif ctype == 'deer':
             self.image, self.rect = load_png('deer.png')
             self.add(deerList)
@@ -68,6 +74,7 @@ class Creature(pygame.sprite.Sprite):
             self.drainRate = 2
             #self.birthsecond = time()
             self.age = 0.0
+            self.id = get_id()
 
         #Set up display information
         screen = pygame.display.get_surface()
@@ -111,7 +118,7 @@ class Creature(pygame.sprite.Sprite):
             #     self.speed = self.baseSpeed
 
             left, right, up, down, speed = False, False, False, False, False
-            #self.dx, self.dy = 0, 0 #Reset speed
+            self.dx, self.dy = 0, 0 #Reset speed
 
             #Establish 'buttons pressed': 
             if int(round(action[0])) == 1:
@@ -182,6 +189,17 @@ class Creature(pygame.sprite.Sprite):
         self.vision = visionTemp
         return
 
+    def print_vision():
+        print self.name.rstrip(), self.energy
+        print "Vision: "
+        print "     %s" % (const.tileNames[self.vision[0]])
+        print "  %s  %s  %s" % (const.tileNames[self.vision[2]], 
+                                const.tileNames[self.vision[4]], 
+                                const.tileNames[self.vision[3]])
+        print "     %s" % (const.tileNames[self.vision[1]])
+        return
+
+
     def eat(self, eatEnergy):
         if self.energy < self.maxEnergy:
             self.energy += eatEnergy
@@ -192,19 +210,28 @@ class Creature(pygame.sprite.Sprite):
         # print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
         #     self.name.rstrip())
         if self.ctype == 'tiger':
+            fitness = self.calc_fitness()
+            fitnesses.append(fitness)
             if not deathByWall:
-                fitness = self.killCount * 10 + len(self.tiles) * 3
-                ga.pool(fitness, self.DNA, self.ctype)
-                for t in ga.tGenepool: #record best performing tigers
-                    if t[1] == self.DNA:
-                        bestTigerList.append([epoch, self.name, fitness, self.DNA])
-                        continue
+                wallDeaths.append(0) #see diagnostics, feorh.py
+
+                #If it was good enough to breed, record it for diagnostics
+                ga.pool(fitness, self.DNA, self.ctype, self.id)
+                for t in ga.tGenepool:
+                    if self.id in t:
+                        newBreeders.append([self.id, fitness, self.DNA])
+            else:
+                wallDeaths.append(1) #see diagnostics, feorh.py
             tigerList.remove(self)
         if self.ctype == 'deer':
             if not deathByWall:
-                fitness = self.age + 5.0 * epoch
-                ga.pool(fitness, self.DNA, self.ctype)
+                fitness = self.calc_fitness()
+                ga.pool(fitness, self.DNA, self.ctype, self.id)
             deerList.remove(self)
+
+    def calc_fitness(self):
+        #Fitness function for tigers and deer
+        return self.killCount * 10 + len(self.tiles) * 3 if self.ctype == 'tiger' else self.age + 5 * epoch
 
 def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1], DNA=''):
     """
@@ -239,3 +266,8 @@ def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1
     newSprite = pygame.sprite.RenderPlain(newCreature)
 
     return newCreature, newSprite
+
+def get_id():
+    global idNumber
+    idNumber += 1
+    return idNumber

@@ -4,13 +4,15 @@ Author: Oliver Giles & Max Potter
 Date: June 2017
 Description:
 	- Contains functions for DNA crossover and mutation
+	  as well as management of the gene pool.
 """
 
 import random
+import constants as const
 
 #How many creatures are added to the gene pool in the epoch
-epochTigers = 15
-epochDeers = 15
+epochTigers = const.GENE_POOL_SIZE
+epochDeers = const.GENE_POOL_SIZE
 
 #Lists of children waiting to be born
 tPregnancies = []
@@ -61,13 +63,11 @@ def mutate(DNA, ctype):
 	DNA = list(DNA)
 	#Function to increase to mutations when evolution slows
 	if ctype == 'tiger':
-		maxMutations = (len(DNA) / 12) / (5 + epochTigers)
-		print 'Max mutations:', maxMutations, '\nLength of DNA:', len(DNA) 
+		maxMutations = (len(DNA) / 12) / (5 + epochTigers) 
 	else:
 		maxMutations = (len(DNA) / 12) / (5 + epochDeers)
-
 	numMutations = random.randint(0, maxMutations)
-	
+
 	for i in range(numMutations):
 		mutation = random.randint(0, (len(DNA) - 1))
 		if DNA[mutation] == '0':
@@ -110,7 +110,7 @@ def get_DNA(ctype):
 		del dPregnancies[0]
 	return DNA
 
-def pool(fitness, DNA, ctype):
+def pool(fitness, DNA, ctype, idNum):
 	"""
 	Check if our candidate has a good enough fitness score to be a
 	candidate parent. If so, add it to the list and if necessary sort
@@ -127,10 +127,10 @@ def pool(fitness, DNA, ctype):
 			del dGenepool[15:]
 
 	elif ctype == "tiger" and len (tGenepool) < 15:
-		tGenepool.append([fitness, DNA])
+		tGenepool.append([fitness, DNA, idNum])
 		tGenepool.sort(key=lambda x: x[0], reverse=True)
 	elif ctype == "tiger" and len(tGenepool) >= 15:
 		if fitness > tGenepool[14][0]:
-			tGenepool.append([fitness, DNA])
+			tGenepool.append([fitness, DNA, idNum])
 			tGenepool.sort(key=lambda x: x[0], reverse=True)
 			del tGenepool[15:]
