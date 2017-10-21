@@ -78,6 +78,7 @@ class Creature(pygame.sprite.Sprite):
             self.energy = 200
             self.maxEnergy = 200
             self.drainRate = 2
+            self.timeOnGrass = 0
             #self.birthsecond = time()
             self.age = 0.0
             self.id = get_id()
@@ -102,7 +103,6 @@ class Creature(pygame.sprite.Sprite):
             self.DNA = [choice(possibleActions) for i in range(len(possibleStates))]
         else:
             self.DNA = DNA
-        print len(self.DNA)
 
     def update(self):
         #Deplete energy and check if still alive!
@@ -217,6 +217,8 @@ class Creature(pygame.sprite.Sprite):
             self.energy += eatEnergy
         if self.ctype == 'tiger':
             self.killCount += 1
+        if self.ctype == 'deer':
+            self.timeOnGrass += 1
 
     def die(self, deathByWall = False):
         # print "%s%s %s has died!" % (self.ctype[0].upper(), self.ctype[1:].rstrip(), 
@@ -243,7 +245,7 @@ class Creature(pygame.sprite.Sprite):
 
     def calc_fitness(self):
         #Fitness function for tigers and deer
-        return self.killCount * 10 + len(self.tiles) * 3 if self.ctype == 'tiger' else self.age + 5 * epoch
+        return self.killCount * 10 + len(self.tiles) * 3 if self.ctype == 'tiger' else 2*self.age + self.timeOnGrass + epoch
 
 def spawn_creature(ctype, mapHeight = 100, mapWidth = 150, tileSize = 6, pos=[-1,-1], DNA=''):
     """

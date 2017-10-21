@@ -37,6 +37,7 @@ def DNA_crossover(f, m):
 			pass
 		else:
 			spliceLocs.append(splice)
+
 	spliceLocs.sort()
 	readLoc = 0
 	if random.random() >= 0.5:
@@ -44,15 +45,15 @@ def DNA_crossover(f, m):
 	DNA_c1 = []
 	DNA_c2 = []
 	for idx, i in enumerate(spliceLocs):
-		[DNA_c1.append(f[readLoc:i]) if idx % 2 else DNA_c1.append(m[readLoc:i])]
-		[DNA_c2.append(m[readLoc:i]) if idx % 2 else DNA_c2.append(f[readLoc:i])]
+		[DNA_c1.extend(f[readLoc:i]) if idx % 2 else DNA_c1.extend(m[readLoc:i])]
+		[DNA_c2.extend(m[readLoc:i]) if idx % 2 else DNA_c2.extend(f[readLoc:i])]
 		readLoc = i
 	if len(spliceLocs) % 2:
-		DNA_c1.append(m[readLoc:])
-		DNA_c2.append(f[readLoc:])
+		DNA_c1.extend(m[readLoc:])
+		DNA_c2.extend(f[readLoc:])
 	else:
-		DNA_c1.append(f[readLoc:])
-		DNA_c2.append(m[readLoc:])
+		DNA_c1.extend(f[readLoc:])
+		DNA_c2.extend(m[readLoc:])
 	return DNA_c1, DNA_c2
 
 def mutate(DNA, ctype):
