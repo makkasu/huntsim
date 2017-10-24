@@ -6,16 +6,17 @@ Deer eat grass. Tigers hunt deer. Tigers hide in forests.
 The distribution of grass, forest and neutral tiles is randomly generated (Voronoi map generation).
 
 Animals are controlled by AI. 
-AI is implemented as a static Keras neural network.
+AI is implemented as a static state machine with a genetic algorithm for optimisation.
 Let's see what happens!
 
 Implemented:
 - Map generator
 - Creature class to populate map with tigers and deer
-- Vision system - each creature can see a 5x5 area of the map around them
-- Brains - each creature has 65 neuron neural network (no training)
 - Game loop - check for collisions, move creatures, pass new vision information, update screen.
-- Pseudo-DNA generation - each network has weights that are initially generated from a randomised binary sequences, which are stored as strings.
+- Vision system - each creature can see a 5x5 area of the map around them.
+- Pseudo-DNA generation - creature 'DNA' dictates the response to every possible vision state.
+- Genetic algorithm - fitness assessment determines which animals will breed, then by manipulation of a pair of DNA sequences offspring are generated.
 
 To-do:
-- Genetic algorithm - fitness assessment determines which animals will breed, then by manipulation of a pair of DNA sequences offspring are generated.
+- Optimising fitness function 
+- Meta-training - exploring the parameter space for things like mutation rate and weightings in the fitness function to find optimal values
