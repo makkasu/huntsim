@@ -157,8 +157,7 @@ class Feorh():
         self.display.blit(self.bgSurface,(0,0)) # blit the map to the screen
         return
 
-    def populate(self, ctype, popSize, cListSize = 0, poolSize = 0, 
-                 pregListSize = 0):
+    def populate(self, ctype, popSize, cListSize = 0, poolSize = 0, pregListSize = 0):
         """
         Check if there are enough tigers and deers. If not, create children.
         """
@@ -325,8 +324,7 @@ class Feorh():
                 print ' *                            Epoch:', self.epoch    
         return
 
-def start_display(title, w = const.WIDTH, h = const.HEIGHT, 
-                  tileSize = const.TILESIZE):
+def start_display(title, w = const.WIDTH, h = const.HEIGHT, tileSize = const.TILESIZE):
     """
     Initialise pygame, open and title a window.
     """
